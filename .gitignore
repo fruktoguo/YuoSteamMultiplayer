@@ -1,0 +1,10 @@
+*.csproj
+Library/
+Temp/
+Logs/
+obj/
+UserSettings/
+*.sln
+*.dwlt
+/Game
+/.idea
