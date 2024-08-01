@@ -4,6 +4,9 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using ET;
+using Ping = System.Net.NetworkInformation.Ping;
 
 namespace YuoTools.Extend.Helper.Network
 {
@@ -106,6 +109,21 @@ namespace YuoTools.Extend.Helper.Network
             const int SIO_UDP_CONNRESET = unchecked((int)(IOC_IN | IOC_VENDOR | 12));
 
             socket.IOControl(SIO_UDP_CONNRESET, new[] { Convert.ToByte(false) }, null);
+        }
+
+        public static async ETTask<long> PingAsync(string ipAddress)
+        {
+            using Ping ping = new Ping();
+            try
+            {
+                PingReply reply = await Task.Run(() => ping.Send(ipAddress));
+                return reply.RoundtripTime;
+            }
+            catch (Exception e)
+            {
+                // $"ping {ipAddress} error {e}".LogError();
+                return -1;
+            }
         }
     }
 }

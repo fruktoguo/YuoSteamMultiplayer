@@ -2,39 +2,29 @@ using Steamworks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
+using YuoTools;
+using YuoTools.Extend.Helper.Network;
 
-public class SteamLobbyManager : SerializedMonoBehaviour
+public class SteamLobbyManager : SingletonMono<SteamLobbyManager>
 {
     private CallResult<LobbyCreated_t> createLobbyCallResult;
     private CallResult<LobbyMatchList_t> findAllLobbiesCallResult;
     private CallResult<LobbyEnter_t> joinLobbyCallResult;
 
-    private const string LOBBY_KEY = "unique_key";
-    private const string LOBBY_VALUE = "my_unique_value";
+    private const string LobbyKey = "过滤器";
+    private const string LobbyValue = "YuoHira";
 
-    public event Action<string> OnLobbyListUpdated;
-    public event Action<string> OnChatRoomUpdated;
-    public event Action<bool, string> OnLobbyCreatedCallback;
-    public event Action<bool, string> OnLobbyListReceivedCallback;
-    public event Action<bool, string> OnLobbyEnteredCallback;
-    public event Action OnLobbyExitedCallback; // 新增事件
+    public static event Action<string> OnLobbyListUpdated;
+    public static event Action<string> OnChatRoomUpdated;
+    public static event Action<bool, string> OnLobbyCreatedCallback;
+    public static event Action<bool, string> OnLobbyListReceivedCallback;
+    public static event Action<bool, string> OnLobbyEnteredCallback;
+    public static event Action OnLobbyExitedCallback; // 新增事件
 
     public List<CSteamID> lobbyList = new();
     public List<CSteamID> playerList = new();
-
-    private void Start()
-    {
-        if (!SteamManager.Initialized)
-        {
-            throw new Exception("Steam SDK未初始化！");
-        }
-
-        createLobbyCallResult = new CallResult<LobbyCreated_t>(OnLobbyCreated);
-        findAllLobbiesCallResult = new CallResult<LobbyMatchList_t>(OnLobbyListReceived);
-        joinLobbyCallResult = new CallResult<LobbyEnter_t>(OnLobbyEntered);
-    }
 
     public void CreateLobby()
     {
@@ -57,16 +47,21 @@ public class SteamLobbyManager : SerializedMonoBehaviour
 
         // 设置自定义数据
         CSteamID lobbyID = new CSteamID(result.m_ulSteamIDLobby);
-        SteamMatchmaking.SetLobbyData(lobbyID, LOBBY_KEY, LOBBY_VALUE);
 
-        // 直接加入创建的大厅
-        JoinLobby(new CSteamID(result.m_ulSteamIDLobby));
+        SteamMatchmaking.SetLobbyData(lobbyID, LobbyKey, LobbyValue);
+
+        SteamNetworkManager.Instance.CreateRoom();
+
+        // playerList.Add(SteamUser.GetSteamID());
+        // OnLobbyEnteredCallback?.Invoke(true, $"加入大厅成功！ID: {result.m_ulSteamIDLobby}");
+
+        JoinLobby(lobbyID);
     }
 
     public void FindAllLobbies()
     {
         // 使用自定义数据进行过滤
-        SteamMatchmaking.AddRequestLobbyListStringFilter(LOBBY_KEY, LOBBY_VALUE,
+        SteamMatchmaking.AddRequestLobbyListStringFilter(LobbyKey, LobbyValue,
             ELobbyComparison.k_ELobbyComparisonEqual);
         SteamAPICall_t findAllLobbiesCallback = SteamMatchmaking.RequestLobbyList();
         findAllLobbiesCallResult.Set(findAllLobbiesCallback);
@@ -123,16 +118,21 @@ public class SteamLobbyManager : SerializedMonoBehaviour
 
         playerList.Clear();
 
-        string chatRoom = "";
+        // string chatRoom = "";
         for (int i = 0; i < memberCount; i++)
         {
-            CSteamID memberID = SteamMatchmaking.GetLobbyMemberByIndex(NowLobbyID, i);
-            string memberName = SteamFriends.GetFriendPersonaName(memberID);
-            chatRoom += $"ID: {memberID} 名称: {memberName} 已加入房间\n";
-            playerList.Add(memberID);
+            CSteamID playerID = SteamMatchmaking.GetLobbyMemberByIndex(NowLobbyID, i);
+            string memberName = SteamFriends.GetFriendPersonaName(playerID);
+            // chatRoom += $"ID: {playerID} 名称: {memberName} 已加入房间\n";
+            playerList.Add(playerID);
+
+            // SendP2PRequest(playerID, $"已加入房间");
         }
 
-        OnChatRoomUpdated?.Invoke(chatRoom);
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            SteamNetworkManager.Instance.JoinRoom();
+        }
 
         // 启动处理P2P消息的协程
         coroutineMessage = StartCoroutine(HandleP2PPackets());
@@ -212,11 +212,6 @@ public class SteamLobbyManager : SerializedMonoBehaviour
         Debug.Log($"房主已转交给: {newOwnerID}");
     }
 
-    private void Update()
-    {
-        SteamAPI.RunCallbacks();
-    }
-
     public IEnumerator HandleP2PPackets()
     {
         while (true)
@@ -232,12 +227,43 @@ public class SteamLobbyManager : SerializedMonoBehaviour
                     string memberName = SteamFriends.GetFriendPersonaName(remoteId);
                     Debug.Log($"收到来自 {memberName} (ID: {remoteId}) 的P2P消息: {message}");
 
+                    GetUserIP(remoteId);
                     // 更新聊天房间
                     OnChatRoomUpdated?.Invoke($"{memberName}: {message}");
                 }
             }
 
             yield return null; // 等待下一帧
+        }
+    }
+
+    public async void GetUserIP(CSteamID userID)
+    {
+        // 获取与指定用户的P2P连接状态
+        if (SteamNetworking.GetP2PSessionState(userID, out var sessionState))
+        {
+            if (sessionState.m_bConnectionActive != 0)
+            {
+                // 获取远程IP
+                uint remoteIP = sessionState.m_nRemoteIP;
+                ushort remotePort = sessionState.m_nRemotePort;
+
+                // 将IP地址转换为字符串格式
+                string ipAddress =
+                    $"{(remoteIP & 0xFF)}.{(remoteIP >> 8 & 0xFF)}.{(remoteIP >> 16 & 0xFF)}.{(remoteIP >> 24 & 0xFF)}";
+
+                Debug.Log($"与用户 {userID} 的远程IP: {ipAddress}, 远程端口: {remotePort}");
+                var ping = await NetworkHelper.PingAsync(ipAddress);
+                Debug.Log($"与用户 {userID} 的延迟: {ping}ms");
+            }
+            else
+            {
+                Debug.Log($"与用户 {userID} 的连接未激活，无法获取IP地址。");
+            }
+        }
+        else
+        {
+            Debug.Log($"无法获取与用户 {userID} 的连接状态信息。");
         }
     }
 
@@ -249,5 +275,42 @@ public class SteamLobbyManager : SerializedMonoBehaviour
     public List<CSteamID> GetPlayerList()
     {
         return new List<CSteamID>(playerList);
+    }
+
+    public int GetLobbyMaxPlayerCount(CSteamID lobbyID)
+    {
+        return SteamMatchmaking.GetLobbyMemberLimit(lobbyID);
+    }
+
+    public int GetLobbyPlayerCount(CSteamID lobbyID)
+    {
+        return SteamMatchmaking.GetNumLobbyMembers(lobbyID);
+    }
+
+    private void Start()
+    {
+        if (!SteamManager.Initialized)
+        {
+            throw new Exception("Steam SDK未初始化！");
+        }
+
+        createLobbyCallResult = new CallResult<LobbyCreated_t>(OnLobbyCreated);
+        findAllLobbiesCallResult = new CallResult<LobbyMatchList_t>(OnLobbyListReceived);
+        joinLobbyCallResult = new CallResult<LobbyEnter_t>(OnLobbyEntered);
+    }
+
+    private void Update()
+    {
+        if (SteamManager.Initialized) SteamAPI.RunCallbacks();
+    }
+
+    private void OnDestroy()
+    {
+        OnLobbyListUpdated = null;
+        OnChatRoomUpdated = null;
+        OnLobbyCreatedCallback = null;
+        OnLobbyListReceivedCallback = null;
+        OnLobbyEnteredCallback = null;
+        OnLobbyExitedCallback = null;
     }
 }
