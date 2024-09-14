@@ -47,7 +47,7 @@ namespace YuoTools.UI
             {
                 var item = AddChildAndInstantiate(Child_LobbyItem);
                 item.lobbyID = lobbyID;
-                
+
                 item.Init();
                 item.rectTransform.SetParent(ContentSizeFitter_Content.transform);
                 lobbyItemList.Add(item);
@@ -83,7 +83,7 @@ namespace YuoTools.UI
     {
         public override string Group => "UI/Lobby";
 
-        protected override void Run(View_LobbyComponent view)
+        protected override async void Run(View_LobbyComponent view)
         {
             view.FindAll();
             //关闭窗口的事件注册,名字不同请自行更
@@ -97,6 +97,8 @@ namespace YuoTools.UI
             view.Button_Find.SetBtnClick(view.FindLobbies);
             view.Button_LobbyRefresh.SetBtnClick(view.FindLobbies);
             view.Button_BackSelect.SetBtnClick(view.CloseLobby);
+
+            await SteamNetworkManager.Instance.CheckNATStatus(x => view.TextMeshProUGUI_Tip.text = x);
         }
     }
 

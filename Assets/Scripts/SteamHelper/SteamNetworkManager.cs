@@ -1,6 +1,8 @@
+using ET;
 using UnityEngine;
 using Steamworks;
 using Unity.Netcode;
+using UnityEngine.Events;
 using YuoTools;
 
 public class SteamNetworkManager : SingletonMono<SteamNetworkManager>
@@ -12,10 +14,7 @@ public class SteamNetworkManager : SingletonMono<SteamNetworkManager>
         if (!SteamAPI.Init())
         {
             Debug.LogError("Steam API 初始化失败！");
-            return;
         }
-
-        InvokeRepeating(nameof(CheckNATStatus), 1f, 1f); // 每5秒检查一次NAT状态
     }
 
     private void OnDestroy()
@@ -30,41 +29,47 @@ public class SteamNetworkManager : SingletonMono<SteamNetworkManager>
         Scene.Show();
     }
 
-    private void CheckNATStatus()
+    public async ETTask<bool> CheckNATStatus(UnityAction<string> message)
     {
         SteamNetworkingUtils.GetRelayNetworkStatus(out var status);
 
         // Debug.Log($"NAT类型检查状态: {status.m_eAvail}");
+        while (status.m_eAvail == ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Attempting)
+        {
+            message?.Invoke("正在尝试确定NAT类型...");
+            await YuoWait.WaitTimeAsync(1);
+            SteamNetworkingUtils.GetRelayNetworkStatus(out status);
+        }
 
         switch (status.m_eAvail)
         {
             case ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Attempting:
-                Debug.Log("正在尝试确定NAT类型...");
+                message?.Invoke("正在尝试确定NAT类型...");
                 break;
             case ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Current:
-                Debug.Log("NAT类型已确定，可以进行P2P连接");
                 CheckOver();
-                break;
+                message?.Invoke("NAT类型已确定，可以进行P2P连接");
+                return true;
             case ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Retrying:
-                Debug.Log("NAT类型确定失败，正在重试...");
+                message?.Invoke("NAT类型确定失败，正在重试...");
                 break;
             case ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_NeverTried:
-                Debug.Log("尚未尝试确定NAT类型");
+                message?.Invoke("尚未尝试确定NAT类型");
                 break;
             case ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Failed:
-                Debug.Log("确定NAT类型失败，可能需要使用中继服务器");
                 CheckOver();
+                message?.Invoke("确定NAT类型失败，可能需要使用中继服务器");
                 break;
             default:
-                Debug.Log($"未知的NAT状态: {status.m_eAvail}");
+                message?.Invoke($"未知的NAT状态: {status.m_eAvail}");
                 break;
         }
+
+        return false;
     }
 
     void CheckOver()
     {
-        // 当NAT类型确定后，停止定期检查，并执行连接操作
-        CancelInvoke(nameof(CheckNATStatus));
         InitializeNetworkManager();
     }
 
@@ -80,7 +85,7 @@ public class SteamNetworkManager : SingletonMono<SteamNetworkManager>
         };
 
         isInit = true;
-        
+
         EnterScene();
     }
 

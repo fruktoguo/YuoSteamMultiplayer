@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using YuoTools.Main.Ecs;
 using Sirenix.OdinInspector;
+using TMPro;
 
 namespace YuoTools.UI
 {
@@ -135,6 +136,19 @@ namespace YuoTools.UI
 		}
 
 
+		private TextMeshProUGUI mTextMeshProUGUI_Tip;
+
+		public TextMeshProUGUI TextMeshProUGUI_Tip
+		{
+			get
+			{
+				if (mTextMeshProUGUI_Tip == null)
+					mTextMeshProUGUI_Tip = rectTransform.Find("C_Tip").GetComponent<TextMeshProUGUI>();
+				return mTextMeshProUGUI_Tip;
+			}
+		}
+
+
 		private View_LobbyItemComponent mChild_LobbyItem;
 
 		public View_LobbyItemComponent Child_LobbyItem
@@ -171,6 +185,10 @@ namespace YuoTools.UI
 
 		[FoldoutGroup("ALL")]
 
+		public List<TextMeshProUGUI> all_TextMeshProUGUI = new();
+
+		[FoldoutGroup("ALL")]
+
 		public List<View_LobbyItemComponent> all_View_LobbyItemComponent = new();
 
 		public void FindAll()
@@ -188,6 +206,8 @@ namespace YuoTools.UI
 			all_VerticalLayoutGroup.Add(VerticalLayoutGroup_SelectLobby);;
 				
 			all_ContentSizeFitter.Add(ContentSizeFitter_Content);;
+				
+			all_TextMeshProUGUI.Add(TextMeshProUGUI_Tip);;
 				
 			all_View_LobbyItemComponent.Add(Child_LobbyItem);;
 

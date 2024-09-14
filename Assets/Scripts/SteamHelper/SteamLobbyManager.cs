@@ -289,11 +289,6 @@ public class SteamLobbyManager : SingletonMono<SteamLobbyManager>
 
     private void Start()
     {
-        if (!SteamManager.Initialized)
-        {
-            throw new Exception("Steam SDK未初始化！");
-        }
-
         createLobbyCallResult = new CallResult<LobbyCreated_t>(OnLobbyCreated);
         findAllLobbiesCallResult = new CallResult<LobbyMatchList_t>(OnLobbyListReceived);
         joinLobbyCallResult = new CallResult<LobbyEnter_t>(OnLobbyEntered);
@@ -301,7 +296,7 @@ public class SteamLobbyManager : SingletonMono<SteamLobbyManager>
 
     private void Update()
     {
-        if (SteamManager.Initialized) SteamAPI.RunCallbacks();
+        // if (SteamManager.Initialized) SteamAPI.RunCallbacks();
     }
 
     private void OnDestroy()

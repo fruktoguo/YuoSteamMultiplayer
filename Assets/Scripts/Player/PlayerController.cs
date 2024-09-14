@@ -11,7 +11,7 @@ public class PlayerController : NetworkBehaviour
 
         float moveX = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
         float moveY = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
-        transform.Translate(new Vector3(moveX, moveY));
+        transform.Translate(new Vector3(moveX, 0, moveY));
 
         if (IsServer)
         {
