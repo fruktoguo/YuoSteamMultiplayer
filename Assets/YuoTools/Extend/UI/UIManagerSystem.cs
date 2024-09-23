@@ -1,5 +1,6 @@
 using System.Linq;
 using ET;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using YuoTools.Extend;
 using YuoTools.Main.Ecs;
@@ -24,6 +25,8 @@ namespace YuoTools.UI
                 component.IsOpen = true;
 
                 openItems.Add(component);
+                var sort = TryGetSortComponent(component);
+                sort?.openItems.Add(component);
 
                 component.AddComponent<UIActiveComponent>();
 
@@ -54,11 +57,20 @@ namespace YuoTools.UI
 
             if (component.rectTransform.gameObject.activeSelf) RunSystemAndChild<IUIClose>(component);
 
-            if (component.ModuleUI && moduleUiItems.Contains(component)) moduleUiItems.Remove(component);
+            if (component.ModuleUI && moduleUiItems.Contains(component))
+            {
+                moduleUiItems.Remove(component);
+
+                var sort = TryGetSortComponent(component);
+                sort?.moduleUiItems.Remove(component);
+            }
 
             if (openItems.Contains(component))
             {
                 openItems.Remove(component);
+
+                var sort = TryGetSortComponent(component);
+                sort?.openItems.Remove(component);
             }
 
             component.IsOpen = false;
@@ -105,7 +117,7 @@ namespace YuoTools.UI
                 return await OpenAsync(uiItemsType[typeof(T)].ViewName) as T;
             else
             {
-                Debug.LogError($"UIManagerComponent Open<T> error,not find {typeof(T)}");
+                Debug.LogError($"UIManagerComponent Open error,not find {typeof(T)}");
                 return null;
             }
         }
@@ -144,11 +156,15 @@ namespace YuoTools.UI
 
         public static void ResetWindowLayer(UIComponent component)
         {
+            var sort = Get.TryGetSortComponent(component);
             if (component.ModuleUI)
             {
                 if (!Get.moduleUiItems.Contains(component))
                 {
                     Get.moduleUiItems.Add(component);
+
+                    sort?.moduleUiItems.Add(component);
+
                     component.AddComponent<TopViewComponent>();
                 }
 
@@ -156,8 +172,25 @@ namespace YuoTools.UI
             }
             else
             {
-                component.SetWindowLayer(Get.Transform.childCount - 1 - Get.moduleUiItems.Count);
+                component.SetWindowLayer(sort.Root.childCount - 1 - sort.moduleUiItems.Count);
             }
+        }
+
+        [ShowInInspector] Dictionary<Transform, UIViewSort> uiSortDic = new();
+
+        public UIViewSort TryGetSortComponent(UIComponent view)
+        {
+            var parent = view.rectTransform.parent;
+            if (!uiSortDic.TryGetValue(parent, out var sort))
+            {
+                sort = new UIViewSort
+                {
+                    Root = parent
+                };
+                uiSortDic.Add(parent, sort);
+            }
+
+            return sort;
         }
 
         public async ETTask<UIComponent> AddWindow(string winName, GameObject go = null)
@@ -178,6 +211,7 @@ namespace YuoTools.UI
             component.AddComponent<UIAutoExitComponent>();
 
             if (go == null) go = await Create(winName);
+            if (go == null) return null;
 
             //初始化窗口
             component.rectTransform = go.transform as RectTransform;
@@ -194,8 +228,12 @@ namespace YuoTools.UI
 
             component.ViewName = winName;
 
+            var sort = TryGetSortComponent(component);
+
             uiItems.Add(winName, component);
             uiItemsType.Add(type, component);
+
+            sort.uiItems.Add(winName, component);
 
             if (BaseIndex == -1) BaseIndex = go.transform.GetSiblingIndex();
 
@@ -208,6 +246,9 @@ namespace YuoTools.UI
             if (component.ModuleUI)
             {
                 component.Entity.AddComponent<TopViewComponent>();
+                moduleUiItems.Add(component);
+
+                sort.moduleUiItems.Add(component);
             }
 
             return component;
@@ -220,6 +261,11 @@ namespace YuoTools.UI
             {
                 uiItems.Remove(winName);
                 uiItemsType.Remove(win.Type);
+
+                var sort = TryGetSortComponent(win);
+                sort.uiItems.Add(winName, win);
+
+
                 win.Entity.Dispose();
             }
         }
@@ -236,7 +282,18 @@ namespace YuoTools.UI
 
         public T GetUIView<T>() where T : UIComponent
         {
-            return uiItemsType.ContainsKey(typeof(T)) ? uiItemsType[typeof(T)] as T : null;
+            if (uiItemsType.ContainsKey(typeof(T)))
+                return uiItemsType[typeof(T)] as T;
+            else
+            {
+                // Debug.LogError($"没有找到对应的窗口---{typeof(T)}");
+                return null;
+            }
+        }
+
+        public async ETTask<UIComponent> GetOrAddView(string winName)
+        {
+            return uiItems.ContainsKey(winName) ? uiItems[winName] : await AddWindow(winName);
         }
 
         private async ETTask<GameObject> Create(string winName)
@@ -292,9 +349,9 @@ namespace YuoTools.UI
 
     public partial class UIComponent
     {
-        public void SetWindowLayer(int layer)
+        public void SetWindowLayer(int windowLayer)
         {
-            rectTransform.SetSiblingIndex(layer);
+            rectTransform.SetSiblingIndex(windowLayer);
         }
 
         public T AddChildAndInstantiate<T>(T template) where T : UIComponent, new() =>
@@ -321,22 +378,57 @@ namespace YuoTools.UI
         }
     }
 
+    public class UIViewSort
+    {
+        public Transform Root;
+
+        public Dictionary<string, UIComponent> uiItems = new();
+
+        public List<UIComponent> moduleUiItems = new();
+
+        public List<UIComponent> openItems = new();
+
+        public bool Equal(UIViewSort other)
+        {
+            return Root == other.Root;
+        }
+    }
+
     public class UIManagerAwakeSystem : YuoSystem<UIManagerComponent>, IAwake
     {
         public override string Group => SystemGroupConst.MainUI;
 
         protected override void Run(UIManagerComponent component)
         {
+            if (component != UIManagerComponent.Get) return;
             if (component.Transform == null)
             {
                 component.DestroyComponent();
                 return;
             }
 
-            var uiSettings = component.Transform.GetComponentsInChildren<UISetting>(true);
+            //初始化所有挂载在根节点的UI
+            // var uiSettings = component.Transform.GetComponentsInChildren<UISetting>(true);
+            var uiSettings =Object.FindObjectsOfType<UISetting>(true);
             foreach (var uiSetting in uiSettings)
             {
                 uiSetting.Init();
+            }
+
+            //初始化自动加载的UI
+            var uiAutoLoadConfigs = Resources.LoadAll<UIAutoLoadConfig>("");
+            foreach (var uiAutoLoadConfig in uiAutoLoadConfigs)
+            {
+                foreach (var uiWindow in uiAutoLoadConfig.AutoLoadList)
+                {
+                    var uiObject = uiWindow.Instantiate(component.Transform);
+                    uiObject.name = uiWindow.name;
+                    var uiSetting = uiObject.GetComponent<UISetting>();
+                    if (uiSetting != null)
+                    {
+                        uiSetting.Init();
+                    }
+                }
             }
         }
     }
@@ -378,8 +470,6 @@ namespace YuoTools.UI
 
         protected override void Run(UIManagerComponent component)
         {
-            // var canvas = component.Transform.GetComponent<CanvasScaler>();
-            // ReflexHelper.LogAll(canvas);
         }
     }
 

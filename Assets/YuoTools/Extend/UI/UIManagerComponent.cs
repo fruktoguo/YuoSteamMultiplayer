@@ -31,6 +31,22 @@ namespace YuoTools.UI
         ///  在调用CloseView时是否直接隐藏gameObject
         /// </summary>
         [HideInInspector] public bool AutoHide = true;
+        
+#if UNITY_EDITOR
+        [Button]
+        [HorizontalGroup]
+        void Open()
+        {
+            this.OpenView(ViewName);
+        }
+
+        [HorizontalGroup]
+        [Button]
+        void Close()
+        {
+            this.CloseView();
+        }
+#endif
     }
 
     public static class UIComponentEx

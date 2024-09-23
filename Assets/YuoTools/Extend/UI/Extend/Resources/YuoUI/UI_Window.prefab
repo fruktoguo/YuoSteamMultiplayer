@@ -129,6 +129,8 @@ MonoBehaviour:
   Active: 1
   ModuleUI: 0
   AnimatorLength: 0.5
+  useCustomDirectory: 0
+  customDirectory: YuoUITemplate
   maskableGraphics: []
 --- !u!114 &245352969240212680
 MonoBehaviour:

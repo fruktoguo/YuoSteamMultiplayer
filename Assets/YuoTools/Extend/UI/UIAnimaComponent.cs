@@ -15,40 +15,47 @@ namespace YuoTools.UI
 
         private float animatorDuration;
 
+        [Sirenix.OdinInspector.ShowInInspector] [Sirenix.OdinInspector.ReadOnly]
         public float AnimaDuration
         {
             get
             {
-                if (animation)
+                if (doTweenAnimation)
                 {
-                    return animation.duration;
+                    return doTweenAnimation.duration;
                 }
 
-                if (animator)
+                return animatorDuration;
+            }
+            set
+            {
+                if (doTweenAnimation == null && animator == null)
                 {
-                    return animatorDuration;
+                    animatorDuration = value;
                 }
-
-                return 0;
+                else
+                {
+                    "已有动画组件，无法手动设置动画时长".LogError();
+                }
             }
         }
 
-        private DOTweenAnimation animation;
+        private DOTweenAnimation doTweenAnimation;
 
         private Animator animator;
 
         public async ETTask Open()
         {
-            if (animation)
+            if (AnimaDuration > 0.0001f)
             {
-                animation.DOPlayForward();
-
-                Sate = UISetting.UISate.ShowAnima;
-                await YuoWait.WaitTimeAsync(AnimaDuration);
-            }
-            else if (animator)
-            {
-                animator.Play("In");
+                if (doTweenAnimation)
+                {
+                    doTweenAnimation.DOPlayForward();
+                }
+                else if (animator)
+                {
+                    animator.Play("In");
+                }
 
                 Sate = UISetting.UISate.ShowAnima;
                 await YuoWait.WaitTimeAsync(AnimaDuration);
@@ -59,16 +66,16 @@ namespace YuoTools.UI
 
         public async ETTask Close()
         {
-            if (animation)
+            if (AnimaDuration > 0.0001f)
             {
-                animation.DOPlayBackwards();
-
-                Sate = UISetting.UISate.HideAnima;
-                await YuoWait.WaitTimeAsync(AnimaDuration);
-            }
-            else if (animator)
-            {
-                animator.Play("Out");
+                if (doTweenAnimation)
+                {
+                    doTweenAnimation.DOPlayBackwards();
+                }
+                else if (animator)
+                {
+                    animator.Play("Out");
+                }
 
                 Sate = UISetting.UISate.HideAnima;
                 await YuoWait.WaitTimeAsync(AnimaDuration);
@@ -80,7 +87,7 @@ namespace YuoTools.UI
         public void From(UISetting setting)
         {
             rectTransform = setting.transform as RectTransform;
-            animation = setting.GetComponent<DOTweenAnimation>();
+            doTweenAnimation = setting.GetComponent<DOTweenAnimation>();
             animator = setting.GetComponent<Animator>();
             animatorDuration = setting.AnimatorLength;
         }

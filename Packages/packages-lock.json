@@ -1,21 +1,5 @@
 {
   "dependencies": {
-    "com.firstgeargames.fishnet": {
-      "version": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.2.1",
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.particlesystem": "1.0.0",
-        "com.unity.modules.physics": "1.0.0",
-        "com.unity.modules.physics2d": "1.0.0",
-        "com.unity.modules.ui": "1.0.0"
-      },
-      "hash": "019ab6d5199939788350a8dc04a290aa129bfe72"
-    },
     "com.firstgeargames.fishysteamworks": {
       "version": "https://github.com/FirstGearGames/FishySteamworks.git",
       "depth": 0,

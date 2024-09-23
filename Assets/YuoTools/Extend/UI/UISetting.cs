@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
-using YuoTools.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using YuoTools.Extend.Helper;
 #endif
 
 namespace YuoTools.UI
@@ -18,11 +18,22 @@ namespace YuoTools.UI
         public bool Active = true;
 
         [HorizontalGroup("2")] [LabelText("模块UI")]
-        public bool ModuleUI = false;
+        public bool ModuleUI;
 
-        [ShowIf(nameof(hasAnimator))] public float AnimatorLength = 0.5f;
+        [ShowIf(nameof(HasAnimator))] public float AnimatorLength = 0.5f;
 
-        bool hasAnimator => GetComponent<Animator>() != null;
+        bool HasAnimator => UIAnimator != null;
+
+        private Animator animator;
+
+        public Animator UIAnimator
+        {
+            get
+            {
+                if (!animator) animator = GetComponent<Animator>();
+                return animator;
+            }
+        }
 
 #if UNITY_EDITOR
 
@@ -30,7 +41,17 @@ namespace YuoTools.UI
         [Button("生成UI代码")]
         public void SpawnCode()
         {
+            if (gameObject.transform is not RectTransform)
+            {
+                Debug.LogError("目标窗口没有RectTransform");
+                return;
+            }
+            SpawnUICode.BasePath = useCustomDirectory ? customDirectory : SpawnUICode.DefaultBasePath;
             SpawnUICode.SpawnCode(gameObject);
+            if (useCustomDirectory && customDirectory == "YuoUITemplate")
+            {
+                FileHelper.CheckOrCreateDirectoryPath("YuoUITemplate/Resources/Prefabs/UI");
+            }
         }
 
         [HorizontalGroup("2")]
@@ -67,13 +88,19 @@ namespace YuoTools.UI
             }
         }
 
-        [ShowInInspector] public bool OpenTools { get; set; } = false;
+        [SerializeField] [HorizontalGroup("customDirectory")] [LabelText("自定义生成目录")] [LabelWidth(200)]
+        bool useCustomDirectory;
+
+        [ShowIf("useCustomDirectory")] [HorizontalGroup("customDirectory")] [LabelText("自定义目录")] [SerializeField]
+        string customDirectory = "YuoUITemplate";
+
+        [ShowInInspector] public bool OpenTools { get; set; }
 
 
-        [ShowIf("OpenTools", true)] [FoldoutGroup("Raycast")]
-        public List<MaskableGraphic> maskableGraphics = new List<MaskableGraphic>();
+        [ShowIf("OpenTools")] [FoldoutGroup("Raycast")]
+        public List<MaskableGraphic> maskableGraphics = new();
 
-        [ShowIf("OpenTools", true)]
+        [ShowIf("OpenTools")]
         [FoldoutGroup("Raycast")]
         [Button(ButtonHeight = 30, Name = "获取所有开启了Raycast的物体")]
         public void FindAllRaycast()
@@ -88,7 +115,7 @@ namespace YuoTools.UI
             }
         }
 
-        [ShowIf("OpenTools", true)]
+        [ShowIf("OpenTools")]
         [FoldoutGroup("Raycast")]
         [Button(ButtonHeight = 30, Name = "清除剩余Raycast")]
         public void CloseRaycast()
@@ -114,19 +141,7 @@ namespace YuoTools.UI
                 if (uiComponent == null) $"创建View失败_{o.name}".LogError();
             }
         }
-
-        private Animator animator;
-
-        public Animator Animator
-        {
-            get
-            {
-                if (!animator) animator = GetComponent<Animator>();
-                return animator;
-            }
-        }
-
-
+        
         public bool HasAnima()
         {
             return gameObject.TryGetComponent<DOTweenAnimation>(out var _) ||
