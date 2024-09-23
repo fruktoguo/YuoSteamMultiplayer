@@ -1,34 +1,27 @@
 {
   "dependencies": {
-    "com.community.netcode.transport.steamnetworkingsockets": {
-      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.steamnetworkingsockets",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "0eda04fc2146a4f907a61de6403315bce705279e"
-    },
-    "com.heathen.steamworksfoundation": {
-      "version": "https://github.com/heathen-engineering/Toolkit-for-Steamworks-Foundation.git?path=Unity/com.heathen.steamworksfoundation",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "9611575e8294020c00e96296dde0db9f82235918"
-    },
-    "com.heathen.systemcore": {
-      "version": "https://github.com/heathen-engineering/SystemCore.git?path=/com.heathen.systemcore",
+    "com.firstgeargames.fishnet": {
+      "version": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
       "depth": 0,
       "source": "git",
       "dependencies": {
-        "com.unity.mathematics": "1.2.5"
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.physics2d": "1.0.0",
+        "com.unity.modules.ui": "1.0.0"
       },
-      "hash": "6d58a14fd74c493bdad1476051e5cd48d3553499"
+      "hash": "019ab6d5199939788350a8dc04a290aa129bfe72"
     },
-    "com.rlabrecque.steamworks.net": {
-      "version": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net",
+    "com.firstgeargames.fishysteamworks": {
+      "version": "https://github.com/FirstGearGames/FishySteamworks.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a2fc889ab2672981ec3e6225d551d86ce6923121"
+      "hash": "0320459da446a95fc109aef66d42e1337e3b5fff"
     },
     "com.unity.2d.animation": {
       "version": "10.1.3",
@@ -44,7 +37,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.2d.aseprite": {
-      "version": "1.1.4",
+      "version": "1.1.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -132,7 +125,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.3",
+      "version": "2.0.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -141,7 +134,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.17",
+      "version": "1.8.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -228,12 +221,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.10.0",
+      "version": "2.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.transport": "1.4.0",
-        "com.unity.nuget.mono-cecil": "1.10.1"
+        "com.unity.transport": "2.3.0",
+        "com.unity.nuget.mono-cecil": "1.11.4"
       },
       "url": "https://packages.unity.com"
     },
