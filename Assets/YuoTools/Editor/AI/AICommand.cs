@@ -37,19 +37,21 @@ namespace YuoTools.Extend.AI
         }
 
         static string EditorScriptPrompt(string input)
-            => "Write a Unity Editor script.\n" +
-               " - It provides its functionality as a menu item placed \"Edit\" > \"Do Task\".\n" +
-               " - It doesn’t provide any editor window. It immediately does the task when the menu item is invoked.\n" +
-               " - Don’t use GameObject.FindGameObjectsWithTag.\n" +
-               " - There is no selected object. Find game objects manually.\n" +
-               "The task is described as follows:\n" +
-               "It is necessary to fully qualify the namespace.\n" +
+            => "编写一个Unity编辑器脚本。\n" +
+               " - 它的功能作为一个菜单项放置在\"Edit\" > \"Do Task\"。\n" +
+               " - 它不提供任何编辑器窗口。当菜单项被调用时，它会立即执行任务。\n" +
+               " - 不要使用GameObject.FindGameObjectsWithTag。\n" +
+               " - 没有选中的对象。手动查找游戏对象。\n" +
+               "任务描述如下：\n" +
+               "需要完整限定命名空间。\n" +
                "你必须要添加完整的中文注释\n" +
+               "你绝对不能添加除了代码和注释以外的任何解释\n" +
+               "如果非要解释,则必须全部使用双斜杠的注释来修饰\n" +
                input;
 
         static string CmdPrompt(string input)
-            => "Write a command that can be executed in the Windows command line.\n" +
-               "The task is described as follows:\n" +
+            => "编写一个可以在Windows命令行中执行的命令。\n" +
+               "任务描述如下：\n" +
                "不需要任何的注释\n" +
                "这个命令必须要在Windows命令行中执行\n" +
                "必须保证不会严重威胁Windows安全\n" +
