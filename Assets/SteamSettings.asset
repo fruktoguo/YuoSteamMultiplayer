@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 242f29df75dec3d4cb1cbb74a477bee6, type: 3}
-  m_Name: DemoSteamSettings
+  m_Name: SteamSettings
   m_EditorClassIdentifier: 
   applicationId:
     m_AppId: 480
@@ -28,7 +28,7 @@ MonoBehaviour:
     enableHeartbeats: 1
     supportSpectators: 0
     spectatorServerName: Usually GameDescription + Spectator
-    anonymousServerLogin: 0
+    anonymousServerLogin: 1
     gameServerToken: See https://steamcommunity.com/dev/managegameservers
     isPasswordProtected: 0
     serverName: My Server Name
