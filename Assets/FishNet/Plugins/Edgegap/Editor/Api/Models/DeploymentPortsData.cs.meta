@@ -3,8 +3,8 @@ guid: 62d51b44b8414c9f968ca607ccb06b7e
 timeCreated: 1701522748
 AssetOrigin:
   serializedVersion: 1
-  productId: 207815
-  packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.4.6R
+  productId: 287711
+  packageName: 'FishNet Pro: Networking Evolved'
+  packageVersion: 4.4.6R Pro
   assetPath: Assets/FishNet/Plugins/Edgegap/Editor/Api/Models/DeploymentPortsData.cs
-  uploadId: 694076
+  uploadId: 694075

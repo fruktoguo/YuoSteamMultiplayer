@@ -42,7 +42,7 @@ namespace SteamAPI.SteamHelper
 
         public static void SetLobbyFindFilter()
         {
-            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(nameof(GameFilterKey), GameFilterKey,
+            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(GameFilterKey, GameFilterKey,
                 ELobbyComparison.k_ELobbyComparisonEqual);
         }
 
@@ -60,14 +60,13 @@ namespace SteamAPI.SteamHelper
                 return null;
             }
 
-            string userId = SteamAPIManager.LocalUserSteamID.ToString();
-
+            string userId = SteamAPIManager.LocalUserSteamID.ToString(); 
             var steamID = new CSteamID(lobbyCreatedT.m_ulSteamIDLobby);
             Lobby lobby = steamID;
             // 创建大厅成功后，设置大厅数据
             // 存储房主的SteamID，用于后续的服务器创建
             lobby.SetData("HouseOwnerServerPost", userId); // 房主的SteamID
-            lobby.SetData(nameof(GameFilterKey), GameFilterKey);
+            lobby.SetData(GameFilterKey, GameFilterKey);
             Debug.Log("serverUserId  大厅创建成功:" + userId);
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址
             SteamAPIManager.Instance.fishySteamworks.StartConnection(true); // 设置当前的主机为自己

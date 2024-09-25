@@ -2067,7 +2067,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 5
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 13887351534992225942
+  <AssetPathHash>k__BackingField: 7662524672406929309
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
@@ -2138,7 +2138,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  isPlane: 0
 --- !u!1 &1972321633568710
 GameObject:
   m_ObjectHideFlags: 0

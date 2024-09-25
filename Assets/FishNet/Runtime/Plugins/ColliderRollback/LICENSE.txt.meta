@@ -7,8 +7,8 @@ TextScriptImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 207815
-  packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.4.6R
+  productId: 287711
+  packageName: 'FishNet Pro: Networking Evolved'
+  packageVersion: 4.4.6R Pro
   assetPath: Assets/FishNet/Runtime/Plugins/ColliderRollback/LICENSE.txt
-  uploadId: 694076
+  uploadId: 694075
