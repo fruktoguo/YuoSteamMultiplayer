@@ -1,6 +1,7 @@
 ﻿using System;
 using DG.Tweening;
 using SteamAPI.SteamHelper;
+using Steamworks;
 using UnityEngine;
 using YuoTools.Extend.Helper;
 using YuoTools.Main.Ecs;
@@ -53,15 +54,15 @@ namespace YuoTools.UI
                 }
 
                 // 创建房间
-                // var lobbyQuery = await YuoNetworkManager.Instance.StartHostAsync(maxPlayer);
-                // if (!lobbyQuery.HasValue)
-                // {
-                //     ShowInfo("创建房间失败，请重试。");
-                //     return;
-                // }
+                var lobbyQuery = await SteamLobbyHelper.CreateLobby();
 
-                // Lobby lobby = lobbyQuery.Value;
-                Lobby lobby = new();
+                if (!lobbyQuery.HasValue)
+                {
+                    ShowInfo("创建房间失败，请重试。");
+                    return;
+                }
+
+                Lobby lobby = lobbyQuery.Value;
 
                 // 设置房间名称
                 lobby.SetLobbyName(roomName);
@@ -86,7 +87,8 @@ namespace YuoTools.UI
                 // 显示成功消息
                 ShowInfo("房间创建成功！");
                 View_HoverMessageComponent.GetView().hoverTime = 99999999;
-                View_HoverMessageComponent.GetView().ShowMessage($"房间ID: {lobby.Id}，房间名称: {roomName} 房间拥有者: {lobby.Owner}");
+                View_HoverMessageComponent.GetView()
+                    .ShowMessage($"房间ID: {lobby.Id}，房间名称: {roomName} 房间拥有者: {lobby.Owner}");
                 View_HoverMessageComponent.GetView().hoverTime = 5;
 
                 this.CloseView();
@@ -108,7 +110,7 @@ namespace YuoTools.UI
         {
             view.FindAll();
             //关闭窗口的事件注册,名字不同请自行更
-            view.Button_Close.SetUIClose(view.ViewName);
+            view.Button_Close.SetUICloseAndOpen(view.ViewName, ViewType.MultiplayerMenu);
             // view.Button_Mask.SetUIClose(view.ViewName);
 
             view.TMP_InputField_MaxPlayer.onValueChanged.AddListener(x =>
@@ -144,11 +146,9 @@ namespace YuoTools.UI
                 string steamUserName = SteamFriendsHelper.GetPersonaName(); // 使用SteamFriends获取用户的名字
                 var steamID = SteamUserHelper.GetSteamID();
                 view.TMP_InputField_RoomName.SetTextWithoutNotify($"{steamUserName}的游戏");
-                // var image = await SteamFriendsHelper.GetLargeFriendAvatar(steamID);
-                // if (image.HasValue)
-                // {
-                //     view.RawImage_Avatar.texture = image.Value.ToTexture2D();
-                // }
+                var avatarID = SteamFriendsHelper.GetLargeFriendAvatar(steamID);
+                var image = SteamUtilsHelper.GetImage(avatarID);
+                view.RawImage_Avatar.texture = image;
             }
         }
     }

@@ -10,7 +10,6 @@ public class SteamAPIManager : SteamworksBehaviour
     public NetworkManager networkManager; 
     public FishySteamworks.FishySteamworks fishySteamworks;
 
-
     private void Init()
     {
         // 初始化steamWork
@@ -26,10 +25,7 @@ public class SteamAPIManager : SteamworksBehaviour
     
     public void ChangeToMainScene()
     {
-        SceneManager.LoadScene("MainScene");
-        SteamLobbyManager.CreateLobby();
         
-        networkManager.ClientManager.StartConnection(); 
     }
     
     

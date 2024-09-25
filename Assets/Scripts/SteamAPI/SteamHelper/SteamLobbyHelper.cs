@@ -37,5 +37,67 @@ namespace SteamAPI.SteamHelper
         {
             Debug.LogError(message);
         }
+
+        public const string GameFilterKey = "YuoHira";
+
+        public static void SetLobbyFindFilter()
+        {
+            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(nameof(GameFilterKey), GameFilterKey,
+                ELobbyComparison.k_ELobbyComparisonEqual);
+        }
+
+        /// <summary>
+        /// 创建Steam大厅 
+        /// </summary>
+        public static async Task<Lobby?> CreateLobby(ELobbyType eLobbyType = ELobbyType.k_ELobbyTypePublic,
+            int maxPlayers = 4)
+        {
+            LobbyCreated_t lobbyCreatedT =
+                await SteamMatchmaking.CreateLobby(eLobbyType, maxPlayers).Await<LobbyCreated_t>();
+            if (lobbyCreatedT.m_eResult != EResult.k_EResultOK)
+            {
+                Debug.Log("大厅创建失败");
+                return null;
+            }
+
+            string userId = SteamAPIManager.LocalUserSteamID.ToString();
+
+            var steamID = new CSteamID(lobbyCreatedT.m_ulSteamIDLobby);
+            Lobby lobby = steamID;
+            // 创建大厅成功后，设置大厅数据
+            // 存储房主的SteamID，用于后续的服务器创建
+            lobby.SetData("HouseOwnerServerPost", userId); // 房主的SteamID
+            lobby.SetData(nameof(GameFilterKey), GameFilterKey);
+            Debug.Log("serverUserId  大厅创建成功:" + userId);
+            SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(true); // 设置当前的主机为自己
+            return lobby;
+        }
+
+
+        /// <summary>
+        /// 加入Steam大厅 
+        /// </summary>
+        /// <param name="lobbyId"> 大厅id </param>
+        public static async Task<LobbyEnter_t> JoinLobby(CSteamID lobbyId)
+        {
+            var lobbyEnter = await SteamMatchmaking.JoinLobby(lobbyId).Await<LobbyEnter_t>();
+
+            if (lobbyEnter.m_EChatRoomEnterResponse != (int)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
+            {
+                Debug.Log("加入大厅失败");
+                return lobbyEnter;
+            }
+
+            Lobby lobby = lobbyId;
+            // 处理成功加入大厅的其他逻辑
+            var serverUserId = lobby.GetData("HouseOwnerServerPost");
+            
+            Debug.Log("serverUserId  加入大厅:" + serverUserId);
+            
+            SteamAPIManager.Instance.fishySteamworks.SetClientAddress(serverUserId); // 设置房主的客户端地址
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端
+            return lobbyEnter;
+        }
     }
 }

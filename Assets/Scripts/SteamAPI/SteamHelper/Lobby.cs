@@ -17,8 +17,8 @@ namespace SteamAPI.SteamHelper
 
         public static implicit operator CSteamID(Lobby lobby) => lobby.Id;
 
-        private const string PasswordKey = "password"; // 密码键常量
-        private const string NameKey = "name"; // 名称键常量
+        public const string PasswordKey = "password"; // 密码键常量
+        public const string NameKey = "name"; // 名称键常量
 
         public override string ToString()
         {
@@ -91,7 +91,7 @@ namespace SteamAPI.SteamHelper
 
         public async Task<RoomEnter> Join()
         {
-            var result = await SteamMatchmakingHelper.JoinLobby(Id).Await<LobbyEnter_t>();
+            var result = await SteamLobbyHelper.JoinLobby(Id);
             return (RoomEnter)result.m_EChatRoomEnterResponse;
         }
 
@@ -100,6 +100,16 @@ namespace SteamAPI.SteamHelper
         public void Refresh()
         {
             SteamMatchmakingHelper.RequestLobbyData(Id);
+        }
+        
+        public void SetData(string key, string value)
+        {
+            SteamMatchmakingHelper.SetLobbyData(Id, key, value);
+        }
+        
+        public string GetData(string key)
+        {
+            return SteamMatchmakingHelper.GetLobbyData(Id, key);
         }
 
         /// <summary>

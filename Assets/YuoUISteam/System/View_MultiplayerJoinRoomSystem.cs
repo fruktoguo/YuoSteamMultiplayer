@@ -30,6 +30,7 @@ namespace YuoTools.UI
 
         protected override async void Run(View_MultiplayerJoinRoomComponent view)
         {
+            SteamLobbyHelper.SetLobbyFindFilter();
             var lobbies = await SteamLobbyHelper.FindLobbyListAsync();
             view.RoomItems.DestroyAll();
             if (lobbies is { Length: > 0 })

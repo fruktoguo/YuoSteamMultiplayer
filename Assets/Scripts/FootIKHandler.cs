@@ -48,9 +48,10 @@ public class FootRotationHandler : NetworkBehaviour
         Vector3 footPosition = animator.GetIKPosition(goal);
 
         // 发射射线检测地面
-        RaycastHit hit;
-        Vector3 rayOrigin = footPosition;
-        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, footRayDistance, groundLayer))
+        var height = 0.5f;
+        Vector3 rayOrigin = footPosition + Vector3.up * height; // 从脚上方发射射线
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out var hit, footRayDistance + height, groundLayer))
         {
             // 获取地面法线
             Vector3 groundNormal = hit.normal;
