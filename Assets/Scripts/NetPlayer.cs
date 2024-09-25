@@ -1,126 +1,218 @@
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
-namespace DefaultNamespace
+/// <summary>
+/// 网络玩家控制脚本，负责处理玩家的移动、旋转以及动画。
+/// 继承自 NetworkBehaviour 以实现网络同步。
+/// </summary>
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
+public class NetPlayer : NetworkBehaviour
 {
-    public class NetPlayer : NetworkBehaviour
+    // 动画参数的哈希值，提升访问效率
+    private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");
+    private static readonly int RotationStateHash = Animator.StringToHash("RotationSpeed");
+
+    [Header("移动设置")]
+    [SerializeField]
+    private float moveSpeed = 5f; // 玩家移动速度
+
+    [SerializeField]
+    private float rotationSpeed = 720f; // 玩家旋转速度（度/秒）
+
+    [SerializeField]
+    private float inputThreshold = 0.05f; // 输入阈值，减少微小输入
+
+    [Header("平滑设置")]
+    [SerializeField]
+    private float positionLerpSpeed = 10f; // 位置插值速度
+
+    [SerializeField]
+    private float rotationLerpSpeed = 10f; // 旋转插值速度
+
+    [SerializeField]
+    private float maxRotationPerFrame = 90f; // 每帧最大旋转角度
+
+    [Header("网络同步设置")]
+    [SerializeField]
+    private bool useNetworkTransform = true; // 是否使用 NetworkTransform 进行位置和旋转同步
+
+    private Rigidbody rb;
+    private Animator animator;
+
+    // 当前的输入方向
+    private Vector3 inputDirection = Vector3.zero;
+
+    // 旋转状态，同步变量，范围在-1到1之间
+    private float rotationState = 0f;
+
+    private void Awake()
     {
-        [Header("Movement Settings")] [SerializeField]
-        private float moveSpeed = 5f; // 玩家移动速度
-        [SerializeField] private float rotateSpeed = 720f; // 玩家旋转速度（度/秒）
-        [SerializeField] private float teleportCooldown = 5f; // 传送冷却时间（秒）
-        [SerializeField] private float inputThreshold = 0.1f; // 输入阈值，减少微小输入
-        [SerializeField] private float teleportCheckRadius = 0.5f; // 传送位置周围检查半径
-        [SerializeField] private LayerMask teleportObstacleLayers; // 传送障碍物图层
-        private Rigidbody rb;
-        // 输入缓冲区
-        private Vector3 inputMoveDirection = Vector3.zero;
-        private float inputRotateAmount;
-        // 预先分配的碰撞体数组，避免每次调用时分配新的数组
-        private Collider[] overlapResults = new Collider[10]; // 根据需求调整大小
-        
-        private void Awake()
+        // 获取必要的组件
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+
+        // 确保 Rigidbody 不受重力影响（根据游戏需求调整）
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+    }
+
+    private void Update()
+    {
+        if (!IsOwner) return;
+
+        HandleInput();
+        UpdateAnimator();
+    }
+
+    private void FixedUpdate()
+    {
+        if (!IsOwner) return;
+
+        HandleMovement();
+        HandleRotation();
+    }
+
+    /// <summary>
+    /// 处理玩家的输入，包括移动方向和旋转状态。
+    /// </summary>
+    private void HandleInput()
+    {
+        // 获取水平和垂直输入（例如：键盘的A/D和W/S键）
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveZ = Input.GetAxisRaw("Vertical");
+
+        // 创建一个标准化的移动方向向量
+        Vector3 direction = new Vector3(moveX, 0, moveZ).normalized;
+
+        // 判断输入是否超过阈值
+        if (direction.sqrMagnitude >= inputThreshold * inputThreshold)
         {
-            rb = GetComponent<Rigidbody>(); 
+            inputDirection = direction;
+
+            // 计算旋转状态
+            CalculateRotationState(direction);
         }
-        
-        private void Update()
+        else
         {
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                if (NetworkManager.ClientManager.Started)
-                {
-                    // 客户端已经启动，执行操作
-                    TestSend();
-                }
-                else
-                {
-                    Debug.LogWarning("Client is not active yet.");
-                } 
-            }
-            
-            if (!IsOwner) return;
+            inputDirection = Vector3.zero;
+            rotationState = 0f; // 没有输入时，不旋转
+        }
+    }
 
-            HandleInput();
+    /// <summary>
+    /// 根据输入方向计算旋转状态（-1：左转，0：不转，1：右转）。
+    /// 使用有符号角度确保180度时也能正确旋转，并映射到-1到1的范围内。
+    /// </summary>
+    /// <param name="direction">输入方向</param>
+    private void CalculateRotationState(Vector3 direction)
+    {
+        Vector3 forward = rb.transform.forward;
+        Vector3 inputDir = direction;
+
+        // 计算玩家前向与输入方向之间的有符号角度
+        float angle = Vector3.SignedAngle(forward, inputDir, Vector3.up);
+
+        // 设置一个最小旋转阈值，例如10度，避免在角度变化过小时频繁切换旋转状态
+        float minAngleThreshold = 10f;
+
+        // 将角度映射到-1到1的范围内
+        if (angle > minAngleThreshold)
+        {
+            rotationState = Mathf.Clamp(angle / 180f, 0f, 1f); // 右转
+        }
+        else if (angle < -minAngleThreshold)
+        {
+            rotationState = Mathf.Clamp(angle / 180f, -1f, 0f); // 左转
+        }
+        else
+        {
+            rotationState = 0f; // 不转
         }
 
+        // 调试日志（可选）
+        // Debug.Log($"Rotation State: {rotationState}, Angle: {angle}");
+    }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void TestSend()
+    /// <summary>
+    /// 处理玩家的移动。
+    /// </summary>
+    private void HandleMovement()
+    {
+        if (inputDirection != Vector3.zero)
         {
-            Debug.Log("TestSend");
+            // 计算移动距离
+            Vector3 movement = inputDirection * moveSpeed * Time.fixedDeltaTime;
+            Vector3 newPosition = rb.position + movement;
+
+            // 使用平滑插值移动位置
+            rb.MovePosition(Vector3.Lerp(rb.position, newPosition, positionLerpSpeed * Time.fixedDeltaTime));
         }
-        
-        
-        private void FixedUpdate()
-        {
-            if (!IsOwner) return;
+    }
 
-            // 发送移动和旋转数据的固定间隔
-            if (inputMoveDirection.sqrMagnitude > 0 || Mathf.Abs(inputRotateAmount) > 0)
-            {
-                SubmitMovementAndRotation(inputMoveDirection, inputRotateAmount);
-                // 重置输入缓冲区
-                inputMoveDirection = Vector3.zero;
-                inputRotateAmount = 0f;
-            }
+    /// <summary>
+    /// 处理玩家的旋转。
+    /// </summary>
+    private void HandleRotation()
+    {
+        if (rotationState == 0f)
+        {
+            // 不进行旋转
+            return;
         }
-        
-        /// <summary>
-        /// 处理玩家的输入，包括移动、旋转和传送。
-        /// 将输入存储在缓冲区中，以便在 FixedUpdate 中统一发送。
-        /// </summary>
-        private void HandleInput()
+
+        // 计算旋转方向和旋转速度
+        float rotationDirection = Mathf.Sign(rotationState); // -1 或 1
+
+        // 计算旋转量，并限制最大旋转角度
+        float rotationAmount = Mathf.Clamp(Mathf.Abs(rotationState) * rotationSpeed * Time.fixedDeltaTime * rotationDirection, -maxRotationPerFrame, maxRotationPerFrame);
+
+        // 计算新的旋转
+        Quaternion deltaRotation = Quaternion.Euler(0, rotationAmount, 0);
+        Quaternion newRotation = rb.rotation * deltaRotation;
+
+        // 应用旋转，使用 RotateTowards 保证旋转方向的一致性
+        rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, newRotation, rotationSpeed * Time.fixedDeltaTime));
+    }
+
+    /// <summary>
+    /// 更新动画参数，根据移动速度和旋转状态。
+    /// 移动速度被规范化到0-1范围内。
+    /// 旋转状态是一个平滑的值，在-1到1之间。
+    /// </summary>
+    private void UpdateAnimator()
+    {
+        // 计算当前移动速度
+        float currentSpeed = inputDirection.magnitude * moveSpeed;
+
+        // 规范化移动速度到0-1范围
+        float normalizedSpeed = Mathf.Clamp01(currentSpeed / moveSpeed);
+
+        // 平滑移动速度参数
+        float smoothedSpeed = Mathf.Lerp(animator.GetFloat(MoveSpeedHash), normalizedSpeed, Time.deltaTime * 10f);
+        animator.SetFloat(MoveSpeedHash, smoothedSpeed);
+
+        // 设置旋转状态参数，确保其在-1到1之间
+        float clampedRotationState = Mathf.Clamp(rotationState, -1f, 1f);
+        animator.SetFloat(RotationStateHash, clampedRotationState);
+    }
+
+    /// <summary>
+    /// 网络同步设置（可选）
+    /// 使用 FishNet 的 NetworkTransform 组件自动同步位置和旋转。
+    /// 如果需要自定义同步逻辑，可以在此处实现。
+    /// </summary>
+    private void OnValidate()
+    {
+        // 确保必要组件存在
+        if (rb == null)
         {
-            // 获取水平和垂直输入（例如：键盘的A/D和W/S键）
-            float moveX = Input.GetAxisRaw("Horizontal");
-            float moveZ = Input.GetAxisRaw("Vertical");
-
-            // 创建一个标准化的移动方向向量
-            Vector3 moveDirection = new Vector3(moveX, 0, moveZ).normalized;
-
-            if (moveDirection.sqrMagnitude >= inputThreshold * inputThreshold)
-            {
-                // 不在客户端进行缩放，留给服务器处理
-                inputMoveDirection += moveDirection;
-            } 
-        } 
-        
-        /// <summary>
-        /// 服务器远程过程调用（ServerRpc），接收客户端的移动和旋转请求，并更新 Rigidbody。
-        /// </summary>
-        /// <param name="move">移动向量（未缩放）</param>
-        /// <param name="rotate">旋转量（未缩放）</param>
-        // [ServerRpc(RequireOwnership = true)]
-        // private void SubmitMovementAndRotationServerRpc(Vector3 move, float rotate)
-        private void SubmitMovementAndRotation(Vector3 move, float rotate)
-        {
-            // 安全性验证：限制移动和旋转的最大值
-            float maxMovePerFrame = moveSpeed * Time.fixedDeltaTime * 2; // 允许一定的缓冲
-            float maxRotatePerFrame = rotateSpeed * Time.fixedDeltaTime * 2;
-
-            // 计算实际移动量
-            Vector3 actualMove = move * moveSpeed * Time.fixedDeltaTime;
-
-            if (actualMove.magnitude > maxMovePerFrame)
-            {
-                actualMove = actualMove.normalized * maxMovePerFrame;
-                Debug.LogWarning($"玩家{OwnerId}尝试超出移动限制，已调整移动量。");
-            }
-
-            // 计算实际旋转量
-            float actualRotate = rotate * rotateSpeed * Time.fixedDeltaTime;
-
-            if (Mathf.Abs(actualRotate) > maxRotatePerFrame)
-            {
-                actualRotate = Mathf.Sign(actualRotate) * maxRotatePerFrame;
-                Debug.LogWarning($"玩家{OwnerId}尝试超出旋转限制，已调整旋转量。");
-            }
-
-            // 使用 Rigidbody 移动和旋转
-            rb.MovePosition(rb.position + actualMove);
-            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, actualRotate, 0));
+            rb = GetComponent<Rigidbody>();
         }
-        
+
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
     }
 }
