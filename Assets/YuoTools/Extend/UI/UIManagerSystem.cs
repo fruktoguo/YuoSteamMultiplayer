@@ -302,6 +302,11 @@ namespace YuoTools.UI
                 .Instantiate(Transform);
         }
 
+        public bool HasViewOfName(string viewName)
+        {
+            return uiItems.ContainsKey(viewName);
+        }
+
         private UIComponent _topView;
 
         public UIComponent TopView
@@ -421,6 +426,7 @@ namespace YuoTools.UI
             {
                 foreach (var uiWindow in uiAutoLoadConfig.AutoLoadList)
                 {
+                    if(component.HasViewOfName(uiWindow.name))continue;
                     var uiObject = uiWindow.Instantiate(component.Transform);
                     uiObject.name = uiWindow.name;
                     var uiSetting = uiObject.GetComponent<UISetting>();

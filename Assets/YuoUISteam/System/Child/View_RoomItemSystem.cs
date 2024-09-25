@@ -32,6 +32,7 @@ namespace YuoTools.UI
                 CSteamID owner = SteamMatchmakingHelper.GetLobbyOwner(lobby.Value);
                 if (owner.m_SteamID == 0)
                 {
+                    lobby.Value.Refresh();
                     $"房间:{lobby.Value} 所有者:{owner}".Log();
                 }
             }
@@ -68,7 +69,7 @@ namespace YuoTools.UI
         }
     }
 
-    public class ViewRoomItemUpdateSystem : YuoSystem<View_RoomItemComponent, UIActiveComponent>, IUpdate
+    public class ViewRoomItemUpdateSystem : YuoSystem<View_RoomItemComponent, UIActiveComponent>, IUpdateEverySecond
     {
         protected override void Run(View_RoomItemComponent view, UIActiveComponent active)
         {

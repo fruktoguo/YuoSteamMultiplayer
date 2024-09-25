@@ -20,6 +20,11 @@ namespace SteamAPI.SteamHelper
         private const string PasswordKey = "password"; // 密码键常量
         private const string NameKey = "name"; // 名称键常量
 
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
+
         /// <summary>
         /// 获取房间名称
         /// </summary>
@@ -91,6 +96,11 @@ namespace SteamAPI.SteamHelper
         }
 
         public void Leave() => SteamMatchmakingHelper.LeaveLobby(Id);
+
+        public void Refresh()
+        {
+            SteamMatchmakingHelper.RequestLobbyData(Id);
+        }
 
         /// <summary>
         /// 表示房间进入的结果状态

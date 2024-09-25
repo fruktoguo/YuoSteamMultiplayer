@@ -26,9 +26,15 @@ namespace YuoTools.Extend
                 World.OnDestroy();
         }
 
+        private float time;
         private void Update()
         {
             World.Update();
+            if (time < Time.time)
+            {
+                time += 1;
+                YuoWorld.RunSystemForAll<IUpdateEverySecond>();
+            }
         }
 
         private void FixedUpdate()
