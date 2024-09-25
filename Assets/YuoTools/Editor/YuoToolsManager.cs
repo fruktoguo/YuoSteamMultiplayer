@@ -9,6 +9,7 @@ using YuoTools.Extend.Helper;
 using System.Threading.Tasks;
 using System.Threading;
 
+#if UNITY_EDITOR_WIN
 namespace YuoTools.Editor
 {
     public class YuoToolsManager : OdinEditorWindow
@@ -71,6 +72,7 @@ namespace YuoTools.Editor
                 order++;
                 len = len / 1024;
             }
+
             return $"{len:0.##} {sizes[order]}";
         }
 
@@ -82,6 +84,7 @@ namespace YuoTools.Editor
                 _lastWriteTime = currentWriteTime;
                 _cachedFolderSize = GetFolderSize();
             }
+
             return _cachedFolderSize;
         }
 
@@ -122,7 +125,7 @@ namespace YuoTools.Editor
             }
 
             EditorUtility.ClearProgressBar();
-            
+
             _cachedFolderSize = GetFolderSize();
         }
 
@@ -141,7 +144,8 @@ namespace YuoTools.Editor
             var localTime = GetLastWriteTime(LocalPath);
             if (sourceTime == localTime)
             {
-                var isConfirm = await UnityEditorHelper.ShowConfirmationDialog("提示", "本地YuoTools文件夹已经是最新版本,确认重新下载？", "覆盖", "取消");
+                var isConfirm =
+                    await UnityEditorHelper.ShowConfirmationDialog("提示", "本地YuoTools文件夹已经是最新版本,确认重新下载？", "覆盖", "取消");
                 if (!isConfirm)
                 {
                     return;
@@ -218,3 +222,4 @@ namespace YuoTools.Editor
         }
     }
 }
+#endif
