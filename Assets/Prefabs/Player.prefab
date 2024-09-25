@@ -597,6 +597,7 @@ GameObject:
   - component: {fileID: 7671700228393078774}
   - component: {fileID: 5982543018567438901}
   - component: {fileID: 7189658223215818558}
+  - component: {fileID: 3994495045963038630}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -822,6 +823,49 @@ MonoBehaviour:
   rotationLerpSpeed: 10
   maxRotationPerFrame: 90
   useNetworkTransform: 1
+--- !u!114 &3994495045963038630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1475839679626289257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6973109248299209185}
+  _networkObjectCache: {fileID: 0}
+  _componentConfiguration: 2
+  _synchronizeParent: 0
+  _packing:
+    Position: 1
+    Rotation: 1
+    Scale: 0
+  _interpolation: 2
+  _extrapolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  _clientAuthoritative: 1
+  _sendToOwner: 1
+  _interval: 1
+  _synchronizePosition: 1
+  _positionSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeRotation: 1
+  _rotationSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeScale: 1
+  _scaleSnapping:
+    X: 0
+    Y: 0
+    Z: 0
 --- !u!1 &1680862587401590611
 GameObject:
   m_ObjectHideFlags: 0
