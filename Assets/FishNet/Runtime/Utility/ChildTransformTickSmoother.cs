@@ -175,7 +175,7 @@ namespace FishNet.Object.Prediction
         /// True if were an owner of the NetworkObject during PreTick.
         /// This is only used for performance gains.
         /// </summary>
-        private bool _ownerOnPretick;
+        private bool _useOwnerSmoothing;
         /// <summary>
         /// True if Initialized has been called and settings have not been reset.
         /// </summary>
@@ -224,7 +224,7 @@ namespace FishNet.Object.Prediction
         public void InitializeNetworked(NetworkObject nob, Transform graphicalObject, bool detach, float teleportDistance, float tickDelta, byte ownerInterpolation, TransformPropertiesFlag ownerSmoothedProperties, byte spectatorInterpolation, TransformPropertiesFlag specatorSmoothedProperties, AdaptiveInterpolationType adaptiveInterpolation)
         {
             ResetState();
-            
+
             _networkObject = nob;
             _spectatorInterpolation = spectatorInterpolation;
             _spectatorSmoothedProperties = specatorSmoothedProperties;
@@ -376,6 +376,7 @@ namespace FishNet.Object.Prediction
                 return;
 
             _preTicked = true;
+            _useOwnerSmoothing = (_networkObject == null || _networkObject.IsOwner);
 
             DiscardExcessiveTransformPropertiesQueue();
 
@@ -578,7 +579,7 @@ namespace FishNet.Object.Prediction
 
             _moveRates = MoveRates.GetMoveRates(prevValues, nextValues, duration, teleportT);
             _moveRates.TimeRemaining = duration;
-            
+
             SetMovementMultiplier();
         }
 
@@ -620,7 +621,7 @@ namespace FishNet.Object.Prediction
                 return;
 
             TickTransformProperties ttp = _transformProperties.Peek();
-            TransformPropertiesFlag smoothedProperties = (_ownerOnPretick) ? _ownerSmoothedProperties : _spectatorSmoothedProperties;
+            TransformPropertiesFlag smoothedProperties = (_useOwnerSmoothing) ? _ownerSmoothedProperties : _spectatorSmoothedProperties;
             _moveRates.MoveWorldToTarget(_graphicalObject, ttp.Properties, smoothedProperties, (delta * _movementMultiplier));
 
             float tRemaining = _moveRates.TimeRemaining;
