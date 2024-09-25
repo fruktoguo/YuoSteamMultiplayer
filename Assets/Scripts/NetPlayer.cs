@@ -1,5 +1,5 @@
+using FishNet.Component.Animating;
 using FishNet.Object;
-using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 /// <summary>
@@ -8,6 +8,10 @@ using UnityEngine;
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(NetworkObject))]
+[RequireComponent(typeof(NetworkAnimator))]
+[RequireComponent(typeof(FootRotationHandler))]
 public class NetPlayer : NetworkBehaviour
 {
     // 动画参数的哈希值，提升访问效率

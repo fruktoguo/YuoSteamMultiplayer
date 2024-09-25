@@ -14,15 +14,16 @@ namespace YuoTools.UI
         {
             if (lobby.HasValue && CanJoin())
             {
-                // ReflexHelper.LogAll(lobby.Value.Owner);
-                // YuoNetworkManager.Instance.StartClient(lobby.Value.Owner.Id.Log());
+                _ = lobby.Value.Join();
             }
         }
 
         public bool CanJoin()
         {
-            return true;
+            return LoadOwnerOver;
         }
+
+        public bool LoadOwnerOver;
 
         [Button]
         public void Refresh()
@@ -30,10 +31,12 @@ namespace YuoTools.UI
             if (lobby.HasValue)
             {
                 CSteamID owner = SteamMatchmakingHelper.GetLobbyOwner(lobby.Value);
-                if (owner.m_SteamID == 0)
+                LoadOwnerOver = owner.m_SteamID != 0;
+                Button_Join.interactable = LoadOwnerOver;
+                if (!LoadOwnerOver)
                 {
                     lobby.Value.Refresh();
-                    $"房间:{lobby.Value} 所有者:{owner}".Log();
+                    // $"房间:{lobby.Value} 所有者:{owner}".Log();
                 }
             }
         }
