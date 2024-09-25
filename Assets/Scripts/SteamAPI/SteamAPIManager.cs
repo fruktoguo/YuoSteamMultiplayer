@@ -14,7 +14,7 @@ public class SteamAPIManager : SteamworksBehaviour
     private void Init()
     {
         // 初始化steamWork
-        if (!SteamAPI.Init())
+        if (!Steamworks.SteamAPI.Init())
         { 
             Debug.LogError("SteamAPI.Init() failed.");
             return;
