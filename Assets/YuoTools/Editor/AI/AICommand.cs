@@ -42,9 +42,7 @@ namespace YuoTools.Extend.AI
                " - 它不提供任何编辑器窗口。当菜单项被调用时，它会立即执行任务。\n" +
                " - 不要使用GameObject.FindGameObjectsWithTag。\n" +
                " - 没有选中的对象。手动查找游戏对象。\n" +
-               "任务描述如下：\n" +
                "需要完整限定命名空间。\n" +
-               "你必须要添加完整的中文注释\n" +
                "你绝对不能添加除了代码和注释以外的任何解释\n" +
                "如果非要解释,则必须全部使用双斜杠的注释来修饰\n" +
                input;
@@ -55,6 +53,7 @@ namespace YuoTools.Extend.AI
                "不需要任何的注释\n" +
                "这个命令必须要在Windows命令行中执行\n" +
                "必须保证不会严重威胁Windows安全\n" +
+               "你绝对不能添加除了代码以外的任何解释\n" +
                input;
 
         [HorizontalGroup("button")]

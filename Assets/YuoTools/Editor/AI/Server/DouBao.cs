@@ -83,7 +83,6 @@ namespace YuoTools.Extend.AI
                 stream = true,
                 messages = new[]
                 {
-                    new { role = "system", content = "You are a helpful assistant." },
                     new { role = "user", content = prompt }
                 }
             };
