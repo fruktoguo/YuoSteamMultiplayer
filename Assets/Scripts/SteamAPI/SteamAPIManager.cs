@@ -1,12 +1,16 @@
 using System;
 using FishNet.Managing;
 using HeathenEngineering.SteamworksIntegration;
+using SteamAPI.SteamHelper;
 using Steamworks;
 using UnityEngine;
 
 public class SteamAPIManager : SteamworksBehaviour
 {
     public static ulong LocalUserSteamID;
+    
+    public Lobby? CurrentLobby; 
+    
     public NetworkManager networkManager;
     public FishySteamworks.FishySteamworks fishySteamworks;
 

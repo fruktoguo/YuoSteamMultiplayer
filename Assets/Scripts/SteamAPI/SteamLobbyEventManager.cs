@@ -58,7 +58,10 @@ public class SteamLobbyEventManager : MonoBehaviour
     {
         if (lobbyEnter.m_EChatRoomEnterResponse == (int)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
         {
-            var serverUserId = GetLobbyData(new CSteamID(lobbyEnter.m_ulSteamIDLobby), "HouseOwnerServerPost");
+            var lobbyId = new CSteamID(lobbyEnter.m_ulSteamIDLobby);
+            var serverUserId = GetLobbyData(lobbyId, "HouseOwnerServerPost");
+            Lobby lobby = lobbyId;
+            SteamAPIManager.Instance.CurrentLobby = lobby;
             Debug.Log("serverUserId  加入大厅:" + serverUserId);
             
             SceneManager.LoadScene("GameScene");
@@ -96,6 +99,7 @@ public class SteamLobbyEventManager : MonoBehaviour
     private void OnLeaveLobby(LobbyChatUpdate_t lobbyChatUpdate)
     {
         Debug.Log("离开大厅成功");
+        SteamAPIManager.Instance.CurrentLobby = null;
     }
 
     public void SetLobbyData(CSteamID lobbyId, string key, string value)
