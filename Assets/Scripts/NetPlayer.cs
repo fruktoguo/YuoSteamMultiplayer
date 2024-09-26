@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using FishNet.Component.Animating;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
+using YuoTools;
 
 /// <summary>
 /// 网络玩家控制脚本，负责处理玩家的移动、旋转以及动画。
@@ -18,29 +21,23 @@ public class NetPlayer : NetworkBehaviour
     private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");
     private static readonly int RotationStateHash = Animator.StringToHash("RotationSpeed");
 
-    [Header("移动设置")]
-    [SerializeField]
-    private float moveSpeed = 5f; // 玩家移动速度
+    [Header("移动设置")] [SerializeField] private float moveSpeed = 5f; // 玩家移动速度
 
-    [SerializeField]
-    private float rotationSpeed = 720f; // 玩家旋转速度（度/秒）
+    [SerializeField] private float rotationSpeed = 720f; // 玩家旋转速度（度/秒）
 
-    [SerializeField]
-    private float inputThreshold = 0.05f; // 输入阈值，减少微小输入
+    [SerializeField] private float inputThreshold = 0.05f; // 输入阈值，减少微小输入
 
-    [Header("平滑设置")]
-    [SerializeField]
-    private float positionLerpSpeed = 10f; // 位置插值速度
+    [Header("平滑设置")] [SerializeField] private float positionLerpSpeed = 10f; // 位置插值速度
 
-    [SerializeField]
-    private float rotationLerpSpeed = 10f; // 旋转插值速度
+    [SerializeField] private float rotationLerpSpeed = 10f; // 旋转插值速度
 
-    [SerializeField]
-    private float maxRotationPerFrame = 90f; // 每帧最大旋转角度
+    [SerializeField] private float maxRotationPerFrame = 90f; // 每帧最大旋转角度
 
-    [Header("网络同步设置")]
-    [SerializeField]
-    private bool useNetworkTransform = true; // 是否使用 NetworkTransform 进行位置和旋转同步
+    [Header("网络同步设置")] [SerializeField] private bool useNetworkTransform = true; // 是否使用 NetworkTransform 进行位置和旋转同步
+    
+    [Header("角色模型")] public List<GameObject> playerModels;
+    
+    readonly SyncVar<int> playerModelType = new();
 
     private Rigidbody rb;
     private Animator animator;
@@ -59,6 +56,17 @@ public class NetPlayer : NetworkBehaviour
 
         // 确保 Rigidbody 不受重力影响（根据游戏需求调整）
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+        playerModelType.OnChange += OnModelTypeChange;
+    }
+
+    void OnModelTypeChange(int prev, int next, bool asServer)
+    {
+        playerModels.HideAll();
+        if (playerModels.Count > next)
+        {
+            playerModels[next].Show();
+        }
     }
 
     private void Update()
@@ -67,6 +75,19 @@ public class NetPlayer : NetworkBehaviour
 
         HandleInput();
         UpdateAnimator();
+        HandleModelInput();
+    }
+
+    void HandleModelInput()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            playerModelType.Value = (playerModelType.Value + 1) % playerModels.Count;
+        }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
+            playerModelType.Value = (playerModelType.Value - 1 + playerModels.Count) % playerModels.Count;
+        }
     }
 
     private void FixedUpdate()
@@ -169,7 +190,9 @@ public class NetPlayer : NetworkBehaviour
         float rotationDirection = Mathf.Sign(rotationState); // -1 或 1
 
         // 计算旋转量，并限制最大旋转角度
-        float rotationAmount = Mathf.Clamp(Mathf.Abs(rotationState) * rotationSpeed * Time.fixedDeltaTime * rotationDirection, -maxRotationPerFrame, maxRotationPerFrame);
+        float rotationAmount =
+            Mathf.Clamp(Mathf.Abs(rotationState) * rotationSpeed * Time.fixedDeltaTime * rotationDirection,
+                -maxRotationPerFrame, maxRotationPerFrame);
 
         // 计算新的旋转
         Quaternion deltaRotation = Quaternion.Euler(0, rotationAmount, 0);
@@ -199,24 +222,5 @@ public class NetPlayer : NetworkBehaviour
         // 设置旋转状态参数，确保其在-1到1之间
         float clampedRotationState = Mathf.Clamp(rotationState, -1f, 1f);
         animator.SetFloat(RotationStateHash, clampedRotationState);
-    }
-
-    /// <summary>
-    /// 网络同步设置（可选）
-    /// 使用 FishNet 的 NetworkTransform 组件自动同步位置和旋转。
-    /// 如果需要自定义同步逻辑，可以在此处实现。
-    /// </summary>
-    private void OnValidate()
-    {
-        // 确保必要组件存在
-        if (rb == null)
-        {
-            rb = GetComponent<Rigidbody>();
-        }
-
-        if (animator == null)
-        {
-            animator = GetComponent<Animator>();
-        }
     }
 }

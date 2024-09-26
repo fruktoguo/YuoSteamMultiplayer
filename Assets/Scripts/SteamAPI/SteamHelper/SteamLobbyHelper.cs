@@ -12,7 +12,7 @@ namespace SteamAPI.SteamHelper
             try
             {
                 // 使用Await方法等待大厅列表请求结果
-                LobbyMatchList_t result = await SteamMatchmakingHelper.RequestLobbyList().Await<LobbyMatchList_t>();
+                LobbyMatchList_t result = await SteamMatchmakingHelper.RequestLobbyList().WaitAsync<LobbyMatchList_t>();
 
                 int lobbyCount = (int)result.m_nLobbiesMatching;
                 Lobby[] lobbyIds = new Lobby[lobbyCount];
@@ -53,7 +53,7 @@ namespace SteamAPI.SteamHelper
             int maxPlayers = 4)
         {
             LobbyCreated_t lobbyCreatedT =
-                await SteamMatchmaking.CreateLobby(eLobbyType, maxPlayers).Await<LobbyCreated_t>();
+                await SteamMatchmaking.CreateLobby(eLobbyType, maxPlayers).WaitAsync<LobbyCreated_t>();
             if (lobbyCreatedT.m_eResult != EResult.k_EResultOK)
             {
                 Debug.Log("大厅创建失败");
@@ -80,7 +80,7 @@ namespace SteamAPI.SteamHelper
         /// <param name="lobbyId"> 大厅id </param>
         public static async Task<LobbyEnter_t> JoinLobby(CSteamID lobbyId)
         {
-            var lobbyEnter = await SteamMatchmaking.JoinLobby(lobbyId).Await<LobbyEnter_t>();
+            var lobbyEnter = await SteamMatchmaking.JoinLobby(lobbyId).WaitAsync<LobbyEnter_t>();
 
             if (lobbyEnter.m_EChatRoomEnterResponse != (int)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
             {

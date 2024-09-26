@@ -5,7 +5,7 @@ namespace SteamAPI.SteamHelper
 {
     public static class SteamHelper
     {
-        public static async Task<T> Await<T>(this SteamAPICall_t apiCall)
+        public static async Task<T> WaitAsync<T>(this SteamAPICall_t apiCall)
         {
             var tcs = new TaskCompletionSource<T>();
 

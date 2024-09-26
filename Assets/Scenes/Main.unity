@@ -483,6 +483,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1210700849}
   - component: {fileID: 1210700850}
+  - component: {fileID: 1210700851}
   m_Layer: 0
   m_Name: SteamManager
   m_TagString: Untagged
@@ -526,6 +527,18 @@ MonoBehaviour:
       m_Calls: []
   networkManager: {fileID: 7443408886659150885}
   fishySteamworks: {fileID: 1532001929}
+--- !u!114 &1210700851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210700848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cb65b4f1f84bf5820821f4f554276b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1532001929
 MonoBehaviour:
   m_ObjectHideFlags: 0

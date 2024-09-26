@@ -729,6 +729,7 @@ MonoBehaviour:
   - {fileID: 7671700228393078774}
   - {fileID: 5982543018567438901}
   - {fileID: 7189658223215818558}
+  - {fileID: 3994495045963038630}
   <InitializedParentNetworkBehaviour>k__BackingField: {fileID: 0}
   <InitializedNestedNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -750,7 +751,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 2
+  <PrefabId>k__BackingField: 3
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7807759643866311769
   <SceneId>k__BackingField: 0
@@ -817,12 +818,29 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 6973109248299209185}
   _networkObjectCache: {fileID: 6973109248299209185}
   moveSpeed: 10
-  rotationSpeed: 720
+  rotationSpeed: 360
   inputThreshold: 0.05
-  positionLerpSpeed: 10
+  positionLerpSpeed: 20
   rotationLerpSpeed: 10
   maxRotationPerFrame: 90
   useNetworkTransform: 1
+  playerModels:
+  - {fileID: 2504172226038857736}
+  - {fileID: 4400809162610695347}
+  - {fileID: 7488043257368844639}
+  - {fileID: 3802220785853916180}
+  - {fileID: 162682151600799160}
+  - {fileID: 4140754882476940755}
+  - {fileID: 2503978508188213548}
+  - {fileID: 9204016976453354536}
+  - {fileID: 1935388267893348672}
+  - {fileID: 5649152836093334575}
+  - {fileID: 7795832502295358479}
+  - {fileID: 6115498863128469898}
+  - {fileID: 4276868451580557233}
+  - {fileID: 4475827272053351276}
+  - {fileID: 22141505142854743}
+  - {fileID: 2931642837407009870}
 --- !u!114 &3994495045963038630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -835,9 +853,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 6973109248299209185}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 6973109248299209185}
   _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:
@@ -1317,7 +1335,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6917832621006309476
 Transform:
   m_ObjectHideFlags: 0
@@ -3528,7 +3546,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2485071521908322482
 Transform:
   m_ObjectHideFlags: 0
