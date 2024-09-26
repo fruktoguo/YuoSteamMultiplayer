@@ -60,11 +60,8 @@ public class SteamLobbyEventManager : MonoBehaviour
         {
             var serverUserId = GetLobbyData(new CSteamID(lobbyEnter.m_ulSteamIDLobby), "HouseOwnerServerPost");
             Debug.Log("serverUserId  加入大厅:" + serverUserId);
-            SteamAPIManager.Instance.fishySteamworks.SetClientAddress(serverUserId); // 设置房主的客户端地址
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端
-
+            
             SceneManager.LoadScene("GameScene");
-            SteamAPIManager.Instance.networkManager.ClientManager.StartConnection();
         }
     }
 

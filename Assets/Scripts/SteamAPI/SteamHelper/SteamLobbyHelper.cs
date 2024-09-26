@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Steamworks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace SteamAPI.SteamHelper
 {
@@ -61,18 +62,19 @@ namespace SteamAPI.SteamHelper
             }
 
             string userId = SteamAPIManager.LocalUserSteamID.ToString(); 
-            var steamID = new CSteamID(lobbyCreatedT.m_ulSteamIDLobby);
-            Lobby lobby = steamID;
+            var lobbyId = new CSteamID(lobbyCreatedT.m_ulSteamIDLobby);
+            Lobby lobby = lobbyId;
             // 创建大厅成功后，设置大厅数据
             // 存储房主的SteamID，用于后续的服务器创建
             lobby.SetData("HouseOwnerServerPost", userId); // 房主的SteamID
             lobby.SetData(GameFilterKey, GameFilterKey);
             Debug.Log("serverUserId  大厅创建成功:" + userId);
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(true); // 设置当前的主机为自己
+            
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(true); 
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(false);
             return lobby;
         }
-
 
         /// <summary>
         /// 加入Steam大厅 
@@ -95,6 +97,7 @@ namespace SteamAPI.SteamHelper
             Debug.Log("serverUserId  加入大厅:" + serverUserId);
             
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(serverUserId); // 设置房主的客户端地址
+            
             SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端
             return lobbyEnter;
         }

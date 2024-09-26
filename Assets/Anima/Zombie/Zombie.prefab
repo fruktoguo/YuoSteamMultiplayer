@@ -1962,7 +1962,7 @@ Animator:
   m_GameObject: {fileID: 1960997148460282}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 03336d372b3854043b18096209507e9b, type: 3}
-  m_Controller: {fileID: 9100000, guid: 8513027eae2f51c4dbe56ccb96d0419d, type: 2}
+  m_Controller: {fileID: 22100000, guid: 3f176f0f66adff04f91a6109db398470, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2065,7 +2065,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 5
+  <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7662524672406929309
   <SceneId>k__BackingField: 0
@@ -2117,6 +2117,7 @@ MonoBehaviour:
   rotationLerpSpeed: 10
   maxRotationPerFrame: 90
   useNetworkTransform: 1
+  playerModels: []
 --- !u!114 &-388155305037128896
 MonoBehaviour:
   m_ObjectHideFlags: 0
