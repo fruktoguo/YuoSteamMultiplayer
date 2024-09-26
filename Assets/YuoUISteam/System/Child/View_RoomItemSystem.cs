@@ -10,11 +10,11 @@ namespace YuoTools.UI
     {
         public Lobby? lobby;
 
-        public void Join()
+        public async void Join()
         {
             if (lobby.HasValue && CanJoin())
             {
-                _ = lobby.Value.Join();
+                var roomEnter = await lobby.Value.Join();
             }
         }
 
@@ -33,6 +33,7 @@ namespace YuoTools.UI
                 CSteamID owner = SteamMatchmakingHelper.GetLobbyOwner(lobby.Value);
                 LoadOwnerOver = owner.m_SteamID != 0;
                 Button_Join.interactable = LoadOwnerOver;
+                Image_Mask.gameObject.SetActive(!LoadOwnerOver);
                 if (!LoadOwnerOver)
                 {
                     lobby.Value.Refresh();
@@ -60,6 +61,7 @@ namespace YuoTools.UI
 
         protected override void Run(View_RoomItemComponent view)
         {
+            view.Refresh();
         }
     }
 

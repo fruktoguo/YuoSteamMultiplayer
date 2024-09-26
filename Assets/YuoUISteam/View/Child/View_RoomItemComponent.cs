@@ -101,6 +101,19 @@ namespace YuoTools.UI
 		}
 
 
+		private Image mImage_Mask;
+
+		public Image Image_Mask
+		{
+			get
+			{
+				if (mImage_Mask == null)
+					mImage_Mask = rectTransform.Find("C_Mask").GetComponent<Image>();
+				return mImage_Mask;
+			}
+		}
+
+
 
 		[FoldoutGroup("ALL")]
 		public List<Image> all_Image = new();
@@ -120,7 +133,8 @@ namespace YuoTools.UI
 		public void FindAll()
 		{
 				
-			all_Image.Add(MainImage);;
+			all_Image.Add(MainImage);
+			all_Image.Add(Image_Mask);;
 				
 			all_HorizontalLayoutGroup.Add(MainHorizontalLayoutGroup);;
 				

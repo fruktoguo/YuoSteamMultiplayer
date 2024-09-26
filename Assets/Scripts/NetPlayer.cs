@@ -37,7 +37,7 @@ public class NetPlayer : NetworkBehaviour
     
     [Header("角色模型")] public List<GameObject> playerModels;
     
-    readonly SyncVar<int> playerModelType = new();
+    readonly SyncVar<int> playerModelType = new(new (ReadPermission.OwnerOnly));
 
     private Rigidbody rb;
     private Animator animator;
