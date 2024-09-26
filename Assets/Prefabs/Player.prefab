@@ -818,10 +818,10 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 6973109248299209185}
   _networkObjectCache: {fileID: 6973109248299209185}
   moveSpeed: 10
-  rotationSpeed: 360
+  rotationSpeed: 720
   inputThreshold: 0.05
   positionLerpSpeed: 20
-  rotationLerpSpeed: 10
+  rotationLerpSpeed: 20
   maxRotationPerFrame: 90
   useNetworkTransform: 1
   playerModels:

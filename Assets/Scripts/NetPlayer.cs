@@ -34,10 +34,10 @@ public class NetPlayer : NetworkBehaviour
     [SerializeField] private float maxRotationPerFrame = 90f; // 每帧最大旋转角度
 
     [Header("网络同步设置")] [SerializeField] private bool useNetworkTransform = true; // 是否使用 NetworkTransform 进行位置和旋转同步
-    
+
     [Header("角色模型")] public List<GameObject> playerModels;
-    
-    readonly SyncVar<int> playerModelType = new(new (ReadPermission.OwnerOnly));
+
+    readonly SyncVar<int> playerModelType = new();
 
     private Rigidbody rb;
     private Animator animator;
@@ -82,12 +82,18 @@ public class NetPlayer : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            playerModelType.Value = (playerModelType.Value + 1) % playerModels.Count;
+            SetPlayerModel((playerModelType.Value + 1) % playerModels.Count);
         }
         else if (Input.GetKeyDown(KeyCode.Q))
         {
-            playerModelType.Value = (playerModelType.Value - 1 + playerModels.Count) % playerModels.Count;
+            SetPlayerModel((playerModelType.Value - 1 + playerModels.Count) % playerModels.Count);
         }
+    }
+
+    [ServerRpc]
+    void SetPlayerModel(int index)
+    {
+        playerModelType.Value = index;
     }
 
     private void FixedUpdate()
