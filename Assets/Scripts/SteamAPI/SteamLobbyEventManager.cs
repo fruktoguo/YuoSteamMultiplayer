@@ -59,12 +59,14 @@ public class SteamLobbyEventManager : MonoBehaviour
         if (lobbyEnter.m_EChatRoomEnterResponse == (int)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
         {
             var lobbyId = new CSteamID(lobbyEnter.m_ulSteamIDLobby);
-            var serverUserId = GetLobbyData(lobbyId, "HouseOwnerServerPost");
+            var lobbyOwner = GetLobbyData(lobbyId, "HouseOwnerServerPost");
+            var lobbyOwnerId = new CSteamID(Convert.ToUInt64(lobbyOwner));
             Lobby lobby = lobbyId;
             SteamAPIManager.Instance.CurrentLobby = lobby;
-            Debug.Log("serverUserId  加入大厅:" + serverUserId);
             
             SceneManager.LoadScene("GameScene");
+            
+            Debug.Log($"加入 玩家 {SteamFriendsHelper.GetFriendPersonaName(lobbyOwnerId)}({lobbyOwner}) 的房间 {lobby.LobbyName}");
         }
     }
 

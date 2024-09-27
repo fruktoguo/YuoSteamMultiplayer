@@ -1,18 +1,17 @@
+using System;
 using System.Globalization;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Linq;
-using Sirenix.OdinInspector;
-using YuoTools.Extend.Helper;
 using System.Threading.Tasks;
 using System.Threading;
+using YuoTools.Extend.Helper;
 
 #if UNITY_EDITOR_WIN
 namespace YuoTools.Editor
 {
-    public class YuoToolsManager : OdinEditorWindow
+    public class YuoToolsManager : EditorWindow
     {
         [MenuItem("Tools/YuoTools Manager")]
         private static void OpenWindow()
@@ -20,20 +19,86 @@ namespace YuoTools.Editor
             var window = GetWindow<YuoToolsManager>();
             window.titleContent = new GUIContent("YuoTools Manager");
             window.minSize = new Vector2(620, 100);
-            window.maxSize = new Vector2(620, 100);
+            window.maxSize = new Vector2(621, 101);
             window.Show();
         }
 
-        [ShowInInspector] public string LastWriteTime => GetLastWriteTime();
-        [ShowInInspector] public string FolderSize => GetCachedFolderSize();
+        private string _cachedFolderSize;
+        private long _lastWriteTime;
 
         public const string Path = @"C:\YuoTools\Main";
         public const string BackupPath = @"C:\YuoTools\Backup";
 
         string LocalPath => $"{Application.dataPath}/YuoTools";
 
-        private string _cachedFolderSize;
-        private long _lastWriteTime;
+        private void OnGUI()
+        {
+            GUIStyle labelStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 14,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.gray }
+            };
+
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 14,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white },
+                fixedHeight = 40,
+                fixedWidth = 300,
+                border = new RectOffset(12, 12, 12, 12),
+                margin = new RectOffset(10, 10, 10, 10),
+                padding = new RectOffset(10, 10, 10, 10)
+            };
+
+            EditorGUILayout.LabelField("最后修改时间", GetLastWriteTime(), labelStyle);
+            EditorGUILayout.LabelField("文件夹大小", GetCachedFolderSize(), labelStyle);
+
+            EditorGUILayout.BeginHorizontal(); // 开始水平布局
+
+            if (GUILayout.Button("上传", buttonStyle))
+            {
+                Upload();
+            }
+
+            string downloadButtonText;
+            bool isUpdated = false;
+            if (Directory.Exists(Path))
+            {
+                downloadButtonText = "更新";
+
+                if (GetLastWriteTime() != new DateTime(_lastWriteTime).ToString("yyyy-MM-dd HH:mm:ss"))
+                {
+                    downloadButtonText += " ⬆️";
+                    isUpdated = true;
+                }
+                else
+                {
+                    downloadButtonText += " ✔️";
+                }
+            }
+            else
+            {
+                downloadButtonText = "无源文件";
+            }
+
+            if (!isUpdated)
+            {
+                buttonStyle.normal.textColor = Color.gray;
+            }
+
+            if (GUILayout.Button(downloadButtonText, buttonStyle))
+            {
+                Download();
+            }
+
+            // 恢复按钮样式
+            buttonStyle.normal.textColor = Color.white;
+
+            EditorGUILayout.EndHorizontal(); // 结束水平布局
+        }
+
 
         string GetLastWriteTime()
         {
@@ -88,9 +153,6 @@ namespace YuoTools.Editor
             return _cachedFolderSize;
         }
 
-        [HorizontalGroup("Buttons")]
-        [GUIColor(0.4f, 0.8f, 1.0f)]
-        [Button("上传", ButtonSizes.Large)]
         public async void Upload()
         {
             EditorUtility.DisplayProgressBar("上传", "正在上传文件...", 0.0f);
@@ -129,23 +191,19 @@ namespace YuoTools.Editor
             _cachedFolderSize = GetFolderSize();
         }
 
-        [HorizontalGroup("Buttons")]
-        [GUIColor(0.4f, 1.0f, 0.4f)]
-        [Button("下载", ButtonSizes.Large)]
         public async void Download()
         {
             var sourceTime = GetLastWriteTime(Path);
             if (sourceTime == 0)
             {
-                "没有找到YuoTools文件夹".Log();
+                Debug.Log("没有找到YuoTools文件夹");
                 return;
             }
 
             var localTime = GetLastWriteTime(LocalPath);
             if (sourceTime == localTime)
             {
-                var isConfirm =
-                    await UnityEditorHelper.ShowConfirmationDialog("提示", "本地YuoTools文件夹已经是最新版本,确认重新下载？", "覆盖", "取消");
+                var isConfirm = EditorUtility.DisplayDialog("提示", "本地YuoTools文件夹已经是最新版本,确认重新下载？", "覆盖", "取消");
                 if (!isConfirm)
                 {
                     return;
@@ -153,7 +211,7 @@ namespace YuoTools.Editor
             }
             else
             {
-                var isConfirm = await UnityEditorHelper.ShowConfirmationDialog("提示", "是否下载最新YuoTools文件夹？", "覆盖", "取消");
+                var isConfirm = EditorUtility.DisplayDialog("提示", "是否下载最新YuoTools文件夹？", "覆盖", "取消");
                 if (!isConfirm)
                 {
                     return;

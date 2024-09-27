@@ -1,6 +1,5 @@
-using System;
 using FishNet.Object;
-using UnityEngine;
+using YuoTools.Main.Ecs;
 
 public class PlayerClientManager : NetworkBehaviour
 {
@@ -17,27 +16,15 @@ public class PlayerClientManager : NetworkBehaviour
     
     // todo:缺少事件管理器，需要补充一个。
     // 所有人的得分都在他们的头顶，当有人吃到方块后，上报给服务器，服务器广播给所有人，所有人更新自己的得分。
-    
+    NetPlayerComponent playerComponent;
     private void Awake()
     {
-        AddListener();
-
+        playerComponent = YuoWorld.Scene.AddChild<NetPlayerComponent>();
+        playerComponent.player = this;
     }
-    
-    private void AddListener()
-    {
-        // todo：监听事件
-        
-    }
-    
-    private void RemoveListener()
-    {
-        // todo：移除监听
-    }
-    
     
     private void OnDestroy()
     {
-        RemoveListener();
+        playerComponent?.Entity?.Destroy();
     } 
 }
