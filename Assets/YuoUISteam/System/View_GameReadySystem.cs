@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DG.Tweening;
+using FishNet;
 using FishNet.Managing;
 using SteamAPI.SteamHelper;
 using YuoTools.Extend.Helper;
@@ -10,18 +11,23 @@ namespace YuoTools.UI
     public partial class View_GameReadyComponent
     {
         public void Leave()
-        {
+        { 
             // 关闭页面 
-            this.CloseView();
+            this.CloseView(); 
+            // if (SteamAPIManager.Instance.CurrentLobby != null)
+            // {
+            //     SteamMatchmakingHelper.LeaveLobby(SteamAPIManager.Instance.CurrentLobby.Value);
+            //     this.CloseAndOpenView<View_MultiplayerMenuComponent>();
+            // } 
         }
 
         public void PlayerEnter(NetPlayerComponent component)
         {
+            if (playerViews.ContainsKey(component)) return;
             View_PlayerReadyComponent player = AddChildAndInstantiate(Child_PlayerReady);
+            player.steamID = component.steamID;
             player.TextMeshProUGUI_PlayerName.text = component.Entity.EntityName;
-            var steamID = component.steamID;
-            var avatar = SteamFriendsHelper.GetLargeFriendAvatar(steamID);
-            player.RawImage_Head.texture = SteamUtilsHelper.GetImage(avatar);
+            player.UpdateAvatar();
             playerViews.Add(component, player);
         }
 
@@ -73,6 +79,7 @@ namespace YuoTools.UI
             if (SteamAPIManager.Instance.CurrentLobby is { } lobby)
             {
                 view.TextMeshProUGUI_Title.text = lobby.LobbyName;
+                view.Button_StartGame.gameObject.SetActive(InstanceFinder.IsServerStarted);
             }
         }
     }

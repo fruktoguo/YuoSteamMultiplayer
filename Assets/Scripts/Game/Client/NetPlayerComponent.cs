@@ -25,9 +25,8 @@ public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, ISta
     {
         _component = component;
         var player = component.player;
-        component.AddComponent<EntitySelectComponent>().SelectGameObject = player.gameObject;   
-        await YuoWait.WaitTimeAsync(1);
-        
+        component.AddComponent<EntitySelectComponent>().SelectGameObject = player.gameObject;
+        await YuoWait.WaitFrameAsync(1);
         if (SteamAPIManager.Instance.CurrentLobby != null && player.IsOwner)
         {
             SteamMatchmakingHelper.SetLobbyMemberData(SteamAPIManager.Instance.CurrentLobby.Value,
@@ -35,17 +34,23 @@ public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, ISta
                 SteamAPIManager.Instance.networkManager.ClientManager.Connection.ClientId.ToString());
         }
 
-        await YuoWait.WaitTimeAsync(1);
+        await YuoWait.WaitFrameAsync(1);
 
-        var steamID = SteamAPIManager.Instance.GetMemberSteamId(player.OwnerId);
+        CSteamID steamID = default;
+        while (steamID == default)
+        {
+            steamID = SteamAPIManager.Instance.GetMemberSteamId(player.OwnerId);
+            await YuoWait.WaitFrameAsync(10);
+        }
+
         if (steamID != default)
         {
             component.Entity.EntityName = $"{SteamFriendsHelper.GetFriendPersonaName(steamID)}";
             component.player.gameObject.name = $"{SteamFriendsHelper.GetFriendPersonaName(steamID)}({steamID})";
-            component.steamID = steamID;
+            component.steamID = steamID; 
             $"玩家 {component.Entity.EntityName}({steamID})--ownerID:{player.OwnerId} 加入房间".Log();
         } 
         component.onInitAction?.Invoke();
         component.Entity.RunSystem<INetPlayerAwake>();  
-    } 
+    }  
 }
