@@ -39,11 +39,10 @@ namespace SteamAPI.SteamHelper
             Debug.LogError(message);
         }
 
-        public const string GameFilterKey = "YuoHira";
 
         public static void SetLobbyFindFilter()
         {
-            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(GameFilterKey, GameFilterKey,
+            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey,
                 ELobbyComparison.k_ELobbyComparisonEqual);
         }
 
@@ -61,17 +60,17 @@ namespace SteamAPI.SteamHelper
                 return null;
             }
 
-            string userId = SteamAPIManager.LocalUserSteamID.ToString(); 
+            string userId = SteamAPIManager.LocalUserSteamID.ToString();
             var lobbyId = new CSteamID(lobbyCreatedT.m_ulSteamIDLobby);
             Lobby lobby = lobbyId;
             // 创建大厅成功后，设置大厅数据
             // 存储房主的SteamID，用于后续的服务器创建
-            lobby.SetData("HouseOwnerServerPost", userId); // 房主的SteamID
-            lobby.SetData(GameFilterKey, GameFilterKey);
+            lobby.SetData(SteamHelper.HouseOwnerKey, userId); // 房主的SteamID
+            lobby.SetData(nameof(SteamHelper.GameFilterKey), SteamHelper.GameFilterKey);
             Debug.Log("serverUserId  大厅创建成功:" + userId);
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址
-            
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(true); 
+
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(true);
             SteamAPIManager.Instance.fishySteamworks.StartConnection(false);
             return lobby;
         }
@@ -92,12 +91,12 @@ namespace SteamAPI.SteamHelper
 
             Lobby lobby = lobbyId;
             // 处理成功加入大厅的其他逻辑
-            var serverUserId = lobby.GetData("HouseOwnerServerPost");
-            
+            var serverUserId = lobby.GetData(SteamHelper.HouseOwnerKey);
+
             Debug.Log("serverUserId  加入大厅:" + serverUserId);
-            
+
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(serverUserId); // 设置房主的客户端地址
-            
+
             SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端
             return lobbyEnter;
         }

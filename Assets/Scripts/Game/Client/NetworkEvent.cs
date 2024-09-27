@@ -1,7 +1,13 @@
-public interface INetGameStart
+using YuoTools.Main.Ecs;
+
+public interface INetGameStart : ISystemTag
 {
 }
 
-public interface INetGameEnd
+public interface INetPlayerAwake: ISystemTag
+{
+}
+
+public interface INetGameEnd: ISystemTag
 {
 }

@@ -37,6 +37,19 @@ namespace YuoTools.UI
 		}
 
 
+		private RawImage mRawImage_Head;
+
+		public RawImage RawImage_Head
+		{
+			get
+			{
+				if (mRawImage_Head == null)
+					mRawImage_Head = rectTransform.Find("C_Head").GetComponent<RawImage>();
+				return mRawImage_Head;
+			}
+		}
+
+
 		private Button mButton_Ready;
 
 		public Button Button_Ready
@@ -71,6 +84,9 @@ namespace YuoTools.UI
 		public List<TextMeshProUGUI> all_TextMeshProUGUI = new();
 
 		[FoldoutGroup("ALL")]
+		public List<RawImage> all_RawImage = new();
+
+		[FoldoutGroup("ALL")]
 		public List<Button> all_Button = new();
 
 		public void FindAll()
@@ -80,6 +96,8 @@ namespace YuoTools.UI
 				
 			all_TextMeshProUGUI.Add(TextMeshProUGUI_PlayerName);
 			all_TextMeshProUGUI.Add(TextMeshProUGUI_ReadyText);;
+				
+			all_RawImage.Add(RawImage_Head);;
 				
 			all_Button.Add(Button_Ready);;
 

@@ -1,16 +1,19 @@
 using System;
+using System.Collections.Generic;
 using FishNet.Managing;
 using HeathenEngineering.SteamworksIntegration;
+using Sirenix.OdinInspector;
 using SteamAPI.SteamHelper;
 using Steamworks;
 using UnityEngine;
+using YuoTools;
 
 public class SteamAPIManager : SteamworksBehaviour
 {
     public static ulong LocalUserSteamID;
-    
-    public Lobby? CurrentLobby; 
-    
+
+    public Lobby? CurrentLobby;
+
     public NetworkManager networkManager;
     public FishySteamworks.FishySteamworks fishySteamworks;
 
@@ -26,7 +29,35 @@ public class SteamAPIManager : SteamworksBehaviour
         DontDestroyOnLoad(gameObject);
         LocalUserSteamID = SteamUser.GetSteamID().m_SteamID;
     }
-    
+
+    public void OnLobbyDataUpdate(LobbyDataUpdate_t lobbyDataUpdate)
+    {
+        var lobbyId = new CSteamID(lobbyDataUpdate.m_ulSteamIDLobby);
+        var lobbyMemberNum = SteamMatchmakingHelper.GetNumLobbyMembers(lobbyId);
+        lobbyMembers.Clear();
+        lobbyMembersNetworkId.Clear();
+        for (int i = 0; i < lobbyMemberNum; i++)
+        {
+            var memberId = SteamMatchmakingHelper.GetLobbyMemberByIndex(lobbyId, i);
+            var lobbyMemberData = SteamMatchmakingHelper.GetLobbyMemberData(lobbyId, memberId, SteamHelper.MemberIDKey);
+            if (!lobbyMemberData.IsNullOrSpace())
+            {
+                int memberNetworkId = Convert.ToInt32(lobbyMemberData);
+                lobbyMembers.Add(memberNetworkId, memberId);
+                lobbyMembersNetworkId.Add(memberId, memberNetworkId);
+            }
+        }
+    }
+
+    [ShowInInspector][ReadOnly]
+    Dictionary<int, CSteamID> lobbyMembers = new();
+    [ShowInInspector][ReadOnly]
+    Dictionary<CSteamID, int> lobbyMembersNetworkId = new();
+
+    public CSteamID GetMemberSteamId(int networkId) => lobbyMembers.GetValueOrDefault(networkId);
+
+    public int GetMemberNetworkId(CSteamID memberId) => lobbyMembersNetworkId.GetValueOrDefault(memberId);
+
     // 写个单例
     private static SteamAPIManager _instance;
 

@@ -57,6 +57,19 @@ namespace YuoTools.UI
 		}
 
 
+		private Button mButton_StartGame;
+
+		public Button Button_StartGame
+		{
+			get
+			{
+				if (mButton_StartGame == null)
+					mButton_StartGame = rectTransform.Find("Item/BackGround/C_StartGame").GetComponent<Button>();
+				return mButton_StartGame;
+			}
+		}
+
+
 		private Button mButton_Close;
 
 		public Button Button_Close
@@ -106,6 +119,7 @@ namespace YuoTools.UI
 			all_RectTransform.Add(MainRectTransform);;
 				
 			all_Button.Add(Button_Mask);
+			all_Button.Add(Button_StartGame);
 			all_Button.Add(Button_Close);;
 				
 			all_TextMeshProUGUI.Add(TextMeshProUGUI_Title);;

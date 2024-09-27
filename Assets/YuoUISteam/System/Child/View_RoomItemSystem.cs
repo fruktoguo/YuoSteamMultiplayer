@@ -17,7 +17,7 @@ namespace YuoTools.UI
                 var roomEnter = await lobby.Value.Join();
                 if (roomEnter == Lobby.RoomEnter.Success)
                 {
-                    View_MultiplayerJoinRoomComponent.GetView().CloseView();
+                    View_MultiplayerJoinRoomComponent.GetView().CloseAndOpenView<View_GameReadyComponent>();
                 }
             }
         }

@@ -17,8 +17,6 @@ namespace SteamAPI.SteamHelper
 
         public static implicit operator CSteamID(Lobby lobby) => lobby.Id;
 
-        public const string PasswordKey = "password"; // 密码键常量
-        public const string NameKey = "name"; // 名称键常量
 
         public override string ToString()
         {
@@ -29,7 +27,7 @@ namespace SteamAPI.SteamHelper
         /// 获取房间名称
         /// </summary>
         /// <returns>返回房间名称</returns>
-        public string LobbyName => SteamMatchmakingHelper.GetLobbyData(Id, NameKey);
+        public string LobbyName => SteamMatchmakingHelper.GetLobbyData(Id, SteamHelper.NameKey);
 
         /// <summary>
         /// 获取房间当前人数
@@ -54,28 +52,28 @@ namespace SteamAPI.SteamHelper
         /// </summary>
         /// <param name="password">要设置的房间密码</param>
         public void SetLobbyPassword(string password) =>
-            SteamMatchmakingHelper.SetLobbyData(Id, PasswordKey, password);
+            SteamMatchmakingHelper.SetLobbyData(Id, SteamHelper.PasswordKey, password);
 
         /// <summary>
         /// 获取房间密码
         /// </summary>
         /// <returns>返回房间密码</returns>
         public string GetLobbyPassword() =>
-            SteamMatchmakingHelper.GetLobbyData(Id, PasswordKey);
+            SteamMatchmakingHelper.GetLobbyData(Id, SteamHelper.PasswordKey);
 
         /// <summary>
         /// 检查房间是否设置了密码
         /// </summary>
         /// <returns>如果房间设置了密码则返回true，否则返回false</returns>
         public bool HasLobbyPassword() =>
-            !string.IsNullOrEmpty(SteamMatchmakingHelper.GetLobbyData(Id, PasswordKey));
+            !string.IsNullOrEmpty(SteamMatchmakingHelper.GetLobbyData(Id, SteamHelper.PasswordKey));
 
         /// <summary>
         /// 设置房间名称
         /// </summary>
         /// <param name="name">要设置的房间名称</param>
         public void SetLobbyName(string name) =>
-            SteamMatchmakingHelper.SetLobbyData(Id, NameKey, name);
+            SteamMatchmakingHelper.SetLobbyData(Id, SteamHelper.NameKey, name);
 
         /// <summary>
         /// 设置房间为公开
@@ -101,12 +99,12 @@ namespace SteamAPI.SteamHelper
         {
             SteamMatchmakingHelper.RequestLobbyData(Id);
         }
-        
+
         public void SetData(string key, string value)
         {
             SteamMatchmakingHelper.SetLobbyData(Id, key, value);
         }
-        
+
         public string GetData(string key)
         {
             return SteamMatchmakingHelper.GetLobbyData(Id, key);

@@ -91,7 +91,7 @@ namespace YuoTools.UI
                     .ShowMessage($"房间ID: {lobby.Id}，房间名称: {roomName} 房间拥有者: {lobby.Owner}");
                 View_HoverMessageComponent.GetView().hoverTime = 5;
 
-                this.CloseView();
+                this.CloseAndOpenView<View_GameReadyComponent>();
             }
             catch (Exception ex)
             {
