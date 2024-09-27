@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3113533769141214296}
   - component: {fileID: 2624825078684320581}
   - component: {fileID: 1926248991587820332}
+  - component: {fileID: 6872026528126395041}
   m_Layer: 0
   m_Name: PlayerClientManager
   m_TagString: Untagged
@@ -95,3 +96,15 @@ MonoBehaviour:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
     LocalScale: {x: 0, y: 0, z: 0}
+--- !u!114 &6872026528126395041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7751784768931247937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86655a44c60d99647bc0b5f4d5f09368, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

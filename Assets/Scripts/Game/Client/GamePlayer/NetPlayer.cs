@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FishNet.Component.Animating;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using SteamAPI.SteamHelper;
 using TMPro;
 using UnityEngine;
 using YuoTools;
@@ -21,9 +22,9 @@ namespace Game.Client.GamePlayer
     [RequireComponent(typeof(FootRotationHandler))] 
     public class NetPlayer : NetworkBehaviour
     {   
-        readonly SyncVar<int> EatCount = new(); 
-        private TextMeshProUGUI _ScoreText; 
-        private TextMeshProUGUI _NameText; 
+        readonly SyncVar<int> EatCount = new(0,new SyncTypeSettings(ReadPermission.ExcludeOwner)); 
+        [Header("分数Text")] [SerializeField] private TextMeshProUGUI _ScoreText; 
+        [Header("名称")] [SerializeField] private TextMeshProUGUI _NameText; 
         
         // 动画参数的哈希值，提升访问效率
         private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");
@@ -66,8 +67,24 @@ namespace Game.Client.GamePlayer
             rb.constraints = RigidbodyConstraints.FreezeRotation;
 
             // 暂时先直接创建，之后可能是通过自己的netID去工厂获取。 
-            AddArgsChangeEvent();
+            AddArgsChangeEvent(); 
         }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            if (IsOwner)
+            {
+                CameraManager.Instance.SetFollowTarget(transform);   // 先临时这么写
+                
+                var steamID = SteamAPIManager.Instance.GetMemberSteamId(OwnerId);
+                if (steamID != default)
+                { 
+                    var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
+                    _NameText.text = friendPersonaName;
+                }
+            }
+        } 
 
         private void AddArgsChangeEvent()
         {
@@ -91,9 +108,15 @@ namespace Game.Client.GamePlayer
         }
         
         void OnEatCountChange(int prev, int next, bool asServer)
-        { 
-            Debug.Log($"EatCount:{next}");   
-            // _ScoreText.text = $"得分:{next}";
+        {
+            // var steamID = SteamAPIManager.Instance.GetMemberSteamId(OwnerId);
+            // if (steamID != default)
+            // { 
+            //     var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
+            //      
+            // }    
+            _ScoreText.text = next.ToString();
+            Debug.Log($"[OwnerId:{OwnerId}]  --- EatCount:{next}");  
         }
 
         private void Update()

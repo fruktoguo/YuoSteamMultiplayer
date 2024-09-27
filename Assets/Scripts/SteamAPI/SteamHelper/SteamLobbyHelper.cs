@@ -42,8 +42,8 @@ namespace SteamAPI.SteamHelper
 
         public static void SetLobbyFindFilter()
         {
-            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey,
-                ELobbyComparison.k_ELobbyComparisonEqual);
+            // SteamMatchmakingHelper.AddRequestLobbyListStringFilter(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey,
+            //     ELobbyComparison.k_ELobbyComparisonEqual);
         }
 
         /// <summary>
@@ -66,12 +66,11 @@ namespace SteamAPI.SteamHelper
             // 创建大厅成功后，设置大厅数据
             // 存储房主的SteamID，用于后续的服务器创建
             lobby.SetData(SteamHelper.HouseOwnerKey, userId); // 房主的SteamID
-            lobby.SetData(nameof(SteamHelper.GameFilterKey), SteamHelper.GameFilterKey);
+            lobby.SetData(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey);
             Debug.Log("serverUserId  大厅创建成功:" + userId);
-            SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址
-
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(true);
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(false);
+            SteamAPIManager.Instance.fishySteamworks.SetClientAddress(userId); // 设置房主的客户端地址 
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(true); 
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端 
             return lobby;
         }
 
@@ -96,9 +95,8 @@ namespace SteamAPI.SteamHelper
             Debug.Log("serverUserId  加入大厅:" + serverUserId);
 
             SteamAPIManager.Instance.fishySteamworks.SetClientAddress(serverUserId); // 设置房主的客户端地址
-
-            SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端
+            SteamAPIManager.Instance.fishySteamworks.StartConnection(false); // 链接客户端  
             return lobbyEnter;
-        }
+        } 
     }
 }

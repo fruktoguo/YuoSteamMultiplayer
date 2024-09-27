@@ -5,6 +5,7 @@ using HeathenEngineering.SteamworksIntegration;
 using Sirenix.OdinInspector;
 using SteamAPI.SteamHelper;
 using Steamworks;
+using UniFramework.Event;
 using UnityEngine;
 using YuoTools;
 
@@ -24,14 +25,17 @@ public class SteamAPIManager : SteamworksBehaviour
         {
             Debug.LogError("SteamAPI.Init() failed.");
             return;
-        }
-
+        }  
         DontDestroyOnLoad(gameObject);
         LocalUserSteamID = SteamUser.GetSteamID().m_SteamID;
     }
 
     public void OnLobbyDataUpdate(LobbyDataUpdate_t lobbyDataUpdate)
     {
+        if (CurrentLobby != null && CurrentLobby.Value.Id.m_SteamID != lobbyDataUpdate.m_ulSteamIDLobby)
+        {
+            return;
+        } 
         var lobbyId = new CSteamID(lobbyDataUpdate.m_ulSteamIDLobby);
         var lobbyMemberNum = SteamMatchmakingHelper.GetNumLobbyMembers(lobbyId);
         lobbyMembers.Clear();
@@ -54,7 +58,10 @@ public class SteamAPIManager : SteamworksBehaviour
     [ShowInInspector][ReadOnly]
     Dictionary<CSteamID, int> lobbyMembersNetworkId = new();
 
-    public CSteamID GetMemberSteamId(int networkId) => lobbyMembers.GetValueOrDefault(networkId);
+    public CSteamID GetMemberSteamId(int networkId)
+    {
+        return lobbyMembers.GetValueOrDefault(networkId);
+    }
 
     public int GetMemberNetworkId(CSteamID memberId) => lobbyMembersNetworkId.GetValueOrDefault(memberId);
 

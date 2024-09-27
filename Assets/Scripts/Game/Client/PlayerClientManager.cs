@@ -16,27 +16,33 @@ public class PlayerClientManager : NetworkBehaviour
     // todo:缺少事件管理器，需要补充一个。
     // 所有人的得分都在他们的头顶，当有人吃到方块后，上报给服务器，服务器广播给所有人，所有人更新自己的得分。
     NetPlayerComponent playerComponent;
-    private void Awake()
-    {
-        playerComponent = YuoWorld.Scene.AddChild<NetPlayerComponent>();
-        playerComponent.player = this;
-    }
-
-
+    
     public override void OnStartClient()
     {
-        base.OnStartClient();
-        OnGameEnter();
+        base.OnStartClient(); 
+        playerComponent = YuoWorld.Scene.AddChild<NetPlayerComponent>();
+        playerComponent.player = this;
+        playerComponent.onInitAction = OnGameEnter;   // 其实这里应该是开启游戏的事件，这里只是一个示例
+        // 可以抛一个事件出去，表示该客户端已经初始化完成了 
     }
 
 
-    [ServerRpc]
     public void OnGameEnter()
     {
         if (!IsOwner) return;
-        
+        var async = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("GameScene");
+        if (async != null)
+            async.completed += _ => { S_OnGameEnter(); }; 
+    }
+    
+
+    [ServerRpc]
+    private void S_OnGameEnter()
+    { 
         var player = Instantiate(playerPrefab);
         player.transform.position = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+        
+        Debug.Log($"绑定owner ！ OwnerID：{OwnerId}");
         Spawn(player,Owner);  
     }
     

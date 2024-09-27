@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SteamAPI.SteamHelper;
 using Steamworks;
+using UniFramework.Event;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YuoTools;
+
+public class OnLobbyDataUpdateEvent : IEventMessage
+{
+    public LobbyDataUpdate_t lobbyDataUpdate;
+}
+
 
 public class SteamLobbyEventManager : MonoBehaviour
 {
@@ -52,9 +59,8 @@ public class SteamLobbyEventManager : MonoBehaviour
     }
 
     private void OnLobbyDataUpdate(LobbyDataUpdate_t lobbyDataUpdate)
-    {
-        SteamAPIManager.Instance.OnLobbyDataUpdate(lobbyDataUpdate);
-
+    { 
+        SteamAPIManager.Instance.OnLobbyDataUpdate(lobbyDataUpdate); 
         Debug.Log("大厅数据更新");
     }
 
@@ -67,9 +73,6 @@ public class SteamLobbyEventManager : MonoBehaviour
             var lobbyOwnerId = new CSteamID(Convert.ToUInt64(lobbyOwner));
             Lobby lobby = lobbyId;
             SteamAPIManager.Instance.CurrentLobby = lobby;
-           
-            SceneManager.LoadScene("GameScene");
-
             Debug.Log(
                 $"加入 玩家 {SteamFriendsHelper.GetFriendPersonaName(lobbyOwnerId)}({lobbyOwner}) 的房间 {lobby.LobbyName}");
         }

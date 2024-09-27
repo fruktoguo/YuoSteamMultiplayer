@@ -11,6 +11,8 @@ namespace YuoTools.UI
     {
         public void Leave()
         {
+            // 关闭页面 
+            this.CloseView();
         }
 
         public void PlayerEnter(NetPlayerComponent component)
