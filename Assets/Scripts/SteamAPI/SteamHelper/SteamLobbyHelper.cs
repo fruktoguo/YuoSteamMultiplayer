@@ -42,8 +42,8 @@ namespace SteamAPI.SteamHelper
 
         public static void SetLobbyFindFilter()
         {
-            // SteamMatchmakingHelper.AddRequestLobbyListStringFilter(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey,
-            //     ELobbyComparison.k_ELobbyComparisonEqual);
+            SteamMatchmakingHelper.AddRequestLobbyListStringFilter(SteamHelper.GameFilterKey, SteamHelper.GameFilterKey,
+                ELobbyComparison.k_ELobbyComparisonEqual);
         }
 
         /// <summary>

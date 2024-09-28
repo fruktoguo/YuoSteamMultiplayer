@@ -25,16 +25,13 @@ public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, ISta
     {
         _component = component;
         var player = component.player;
-        component.AddComponent<EntitySelectComponent>().SelectGameObject = player.gameObject;
-        await YuoWait.WaitFrameAsync(1);
+        component.AddComponent<EntitySelectComponent>().SelectGameObject = player.gameObject; 
         if (SteamAPIManager.Instance.CurrentLobby != null && player.IsOwner)
         {
             SteamMatchmakingHelper.SetLobbyMemberData(SteamAPIManager.Instance.CurrentLobby.Value,
                 SteamHelper.MemberIDKey,
                 SteamAPIManager.Instance.networkManager.ClientManager.Connection.ClientId.ToString());
-        }
-
-        await YuoWait.WaitFrameAsync(1);
+        } 
 
         CSteamID steamID = default;
         while (steamID == default)

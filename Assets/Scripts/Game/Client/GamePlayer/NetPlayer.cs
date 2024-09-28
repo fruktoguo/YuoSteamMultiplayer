@@ -22,7 +22,7 @@ namespace Game.Client.GamePlayer
     [RequireComponent(typeof(FootRotationHandler))] 
     public class NetPlayer : NetworkBehaviour
     {   
-        readonly SyncVar<int> EatCount = new(0,new SyncTypeSettings(ReadPermission.ExcludeOwner)); 
+        readonly SyncVar<int> EatCount = new(); 
         [Header("分数Text")] [SerializeField] private TextMeshProUGUI _ScoreText; 
         [Header("名称")] [SerializeField] private TextMeshProUGUI _NameText; 
         
@@ -83,6 +83,10 @@ namespace Game.Client.GamePlayer
                     var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
                     _NameText.text = friendPersonaName;
                 }
+                else
+                {
+                    _NameText.text = "没有取到";
+                }
             }
         } 
 
@@ -109,14 +113,7 @@ namespace Game.Client.GamePlayer
         
         void OnEatCountChange(int prev, int next, bool asServer)
         {
-            // var steamID = SteamAPIManager.Instance.GetMemberSteamId(OwnerId);
-            // if (steamID != default)
-            // { 
-            //     var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
-            //      
-            // }    
-            _ScoreText.text = next.ToString();
-            Debug.Log($"[OwnerId:{OwnerId}]  --- EatCount:{next}");  
+            _ScoreText.text = next.ToString(); 
         }
 
         private void Update()

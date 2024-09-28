@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 public class PlayerClientManager : NetworkBehaviour
 {
     public GameObject playerPrefab;
+    public GameObject cubeManagerPrefab;  // 测试写的
     
     // todo：这里持有玩家信息，创建时可以去取到信息。
     // 到时候客户端逻辑写在这里面，可以拆出去封装成事件 
@@ -44,6 +45,15 @@ public class PlayerClientManager : NetworkBehaviour
         
         Debug.Log($"绑定owner ！ OwnerID：{OwnerId}");
         Spawn(player,Owner);  
+        
+        CreateCubeManager();
+    }
+
+    [Server]  // 测试写的
+    private void CreateCubeManager()
+    {
+        var cubeMgr = Instantiate(cubeManagerPrefab);
+        Spawn(cubeMgr,Owner);  
     }
     
     private void OnDestroy()
