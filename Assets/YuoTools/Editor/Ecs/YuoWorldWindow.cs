@@ -339,6 +339,12 @@ namespace YuoTools.Editor.Ecs
             [ReadOnly] [HorizontalGroup("info", 300, LabelWidth = 100)] [GUIColor(0.8f, 0.5f, 0.3f)]
             public long EntityID;
 
+            [Button]
+            void DestroyEntity()
+            {
+                Entity.Destroy();
+            }
+
             [ShowInInspector]
             [HorizontalGroup("info", 200, LabelWidth = 100)]
             [GUIColor(0.8f, 0.5f, 0.3f)]

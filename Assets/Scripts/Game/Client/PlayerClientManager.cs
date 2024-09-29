@@ -1,5 +1,7 @@
 using System;
 using FishNet.Object;
+using Game.Manager;
+using Steamworks;
 using UnityEngine;
 using YuoTools.Main.Ecs;
 using Random = UnityEngine.Random;
@@ -8,6 +10,7 @@ public class PlayerClientManager : NetworkBehaviour
 {
     public GameObject playerPrefab;
     public GameObject cubeManagerPrefab;  // 测试写的
+    public CSteamID steamID;
     
     // todo：这里持有玩家信息，创建时可以去取到信息。
     // 到时候客户端逻辑写在这里面，可以拆出去封装成事件 
@@ -58,6 +61,7 @@ public class PlayerClientManager : NetworkBehaviour
     
     private void OnDestroy()
     {
+        PlayerManager.UnRegisterPlayer(this);
         playerComponent?.Entity?.Destroy();
     } 
 }

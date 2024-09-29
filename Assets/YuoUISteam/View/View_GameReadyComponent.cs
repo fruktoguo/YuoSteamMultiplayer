@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using YuoTools.Main.Ecs;
+﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 namespace YuoTools.UI
@@ -33,98 +31,62 @@ namespace YuoTools.UI
 
 		private Button mButton_Mask;
 
-		public Button Button_Mask
-		{
-			get
-			{
-				if (mButton_Mask == null)
-					mButton_Mask = rectTransform.Find("C_Mask").GetComponent<Button>();
-				return mButton_Mask;
-			}
-		}
+		public Button Button_Mask => mButton_Mask ??= rectTransform.Find("C_Mask").GetComponent<Button>();
 
 
 		private TextMeshProUGUI mTextMeshProUGUI_Title;
 
-		public TextMeshProUGUI TextMeshProUGUI_Title
-		{
-			get
-			{
-				if (mTextMeshProUGUI_Title == null)
-					mTextMeshProUGUI_Title = rectTransform.Find("Item/BackGround/C_Title").GetComponent<TextMeshProUGUI>();
-				return mTextMeshProUGUI_Title;
-			}
-		}
+		public TextMeshProUGUI TextMeshProUGUI_Title => mTextMeshProUGUI_Title ??= rectTransform.Find("Item/BackGround/C_Title").GetComponent<TextMeshProUGUI>();
 
 
 		private Button mButton_StartGame;
 
-		public Button Button_StartGame
-		{
-			get
-			{
-				if (mButton_StartGame == null)
-					mButton_StartGame = rectTransform.Find("Item/BackGround/C_StartGame").GetComponent<Button>();
-				return mButton_StartGame;
-			}
-		}
+		public Button Button_StartGame => mButton_StartGame ??= rectTransform.Find("Item/BackGround/C_StartGame").GetComponent<Button>();
 
 
 		private Button mButton_Close;
 
-		public Button Button_Close
-		{
-			get
-			{
-				if (mButton_Close == null)
-					mButton_Close = rectTransform.Find("Item/C_Close").GetComponent<Button>();
-				return mButton_Close;
-			}
-		}
+		public Button Button_Close => mButton_Close ??= rectTransform.Find("Item/C_Close").GetComponent<Button>();
 
 
 		private View_PlayerReadyComponent mChild_PlayerReady;
 
 		public View_PlayerReadyComponent Child_PlayerReady
 		{
-			get
-			{
-				if (mChild_PlayerReady == null)
-				{
-					mChild_PlayerReady = Entity.AddChild<View_PlayerReadyComponent>();
-					mChild_PlayerReady.Entity.EntityName = "PlayerReady";
-					mChild_PlayerReady.rectTransform = rectTransform.Find("Item/BackGround/PlayerList/D_PlayerReady") as RectTransform;
-					mChild_PlayerReady.RunSystem<IUICreate>();
-				}
-				return mChild_PlayerReady;
-			}
-		}
-
+            get
+            {
+                if (mChild_PlayerReady == null)
+                {
+                    mChild_PlayerReady = Entity.AddChild<View_PlayerReadyComponent>();
+                    mChild_PlayerReady.Entity.EntityName = "PlayerReady";
+                    mChild_PlayerReady.rectTransform = rectTransform.Find("Item/BackGround/PlayerList/D_PlayerReady") as RectTransform;
+                    mChild_PlayerReady.RunSystem<IUICreate>();
+                }
+                return mChild_PlayerReady;
+            }
+        }
 
 		[FoldoutGroup("ALL")]
 		public List<RectTransform> all_RectTransform = new();
-
 		[FoldoutGroup("ALL")]
 		public List<Button> all_Button = new();
-
 		[FoldoutGroup("ALL")]
 		public List<TextMeshProUGUI> all_TextMeshProUGUI = new();
-
 		[FoldoutGroup("ALL")]
 		public List<View_PlayerReadyComponent> all_View_PlayerReadyComponent = new();
 
 		public void FindAll()
 		{
 				
-			all_RectTransform.Add(MainRectTransform);;
+			all_RectTransform.Add(MainRectTransform);
 				
 			all_Button.Add(Button_Mask);
 			all_Button.Add(Button_StartGame);
-			all_Button.Add(Button_Close);;
+			all_Button.Add(Button_Close);
 				
-			all_TextMeshProUGUI.Add(TextMeshProUGUI_Title);;
+			all_TextMeshProUGUI.Add(TextMeshProUGUI_Title);
 				
-			all_View_PlayerReadyComponent.Add(Child_PlayerReady);;
+			all_View_PlayerReadyComponent.Add(Child_PlayerReady);
 
 		}
 	}}

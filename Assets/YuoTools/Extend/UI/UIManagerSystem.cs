@@ -413,8 +413,7 @@ namespace YuoTools.UI
             }
 
             //初始化所有挂载在根节点的UI
-            // var uiSettings = component.Transform.GetComponentsInChildren<UISetting>(true);
-            var uiSettings =Object.FindObjectsOfType<UISetting>(true);
+            var uiSettings = Object.FindObjectsByType<UISetting>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var uiSetting in uiSettings)
             {
                 uiSetting.Init();
@@ -426,7 +425,7 @@ namespace YuoTools.UI
             {
                 foreach (var uiWindow in uiAutoLoadConfig.AutoLoadList)
                 {
-                    if(component.HasViewOfName(uiWindow.name))continue;
+                    if (component.HasViewOfName(uiWindow.name)) continue;
                     var uiObject = uiWindow.Instantiate(component.Transform);
                     uiObject.name = uiWindow.name;
                     var uiSetting = uiObject.GetComponent<UISetting>();

@@ -73,8 +73,7 @@ public class SteamLobbyEventManager : MonoBehaviour
             var lobbyOwnerId = new CSteamID(Convert.ToUInt64(lobbyOwner));
             Lobby lobby = lobbyId;
             SteamAPIManager.Instance.CurrentLobby = lobby;
-            Debug.Log(
-                $"加入 玩家 {SteamFriendsHelper.GetFriendPersonaName(lobbyOwnerId)}({lobbyOwner}) 的房间 {lobby.LobbyName}");
+            Debug.Log($"加入 玩家 {SteamFriendsHelper.GetFriendPersonaName(lobbyOwnerId)}({lobbyOwner}) 的房间 {lobby.LobbyName}");
         }
     }
 
@@ -94,8 +93,7 @@ public class SteamLobbyEventManager : MonoBehaviour
     }
 
     #endregion
-
-
+    
     private void Awake()
     {
         RegisterEvents();
@@ -104,6 +102,7 @@ public class SteamLobbyEventManager : MonoBehaviour
     private void OnDestroy()
     {
         UnRegisterEvents();
+        // Steamworks.SteamAPI.Shutdown();
     }
 
     private void OnLeaveLobby(LobbyChatUpdate_t lobbyChatUpdate)
