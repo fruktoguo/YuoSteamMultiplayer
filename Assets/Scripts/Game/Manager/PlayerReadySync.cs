@@ -21,7 +21,6 @@ public class PlayerReadySync : NetworkBehaviour
 
     private void OnValueChange(bool prev, bool next, bool asServer)
     {
-        $"{gameObject.name} Ready: {next}".Log();
         onReadyChange?.Invoke(next);
     }
 
@@ -38,7 +37,6 @@ public class PlayerReadySync : NetworkBehaviour
     [ServerRpc]
     void ServerValueChangeRpc(bool isReady)
     {
-        $"服务器 收到 {gameObject.name} 消息 Ready {isReady}".Log();
         syncValue.Value = isReady;
     }
 }

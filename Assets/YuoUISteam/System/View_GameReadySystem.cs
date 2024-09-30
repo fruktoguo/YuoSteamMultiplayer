@@ -3,6 +3,7 @@ using DG.Tweening;
 using FishNet;
 using FishNet.Managing;
 using Game;
+using Sirenix.OdinInspector;
 using SteamAPI.SteamHelper;
 using YuoTools.Extend.Helper;
 using YuoTools.Main.Ecs;
@@ -33,12 +34,13 @@ namespace YuoTools.UI
             playerViews.Add(component, player);
         }
 
+        [ShowInInspector]
         public Dictionary<NetPlayerComponent, View_PlayerReadyComponent> playerViews = new();
 
         public void PlayerExit(NetPlayerComponent component)
         {
-            View_PlayerReadyComponent player = playerViews[component];
-            player.Entity.Destroy();
+            View_PlayerReadyComponent view = playerViews[component];
+            view.Entity.Destroy();
             playerViews.Remove(component);
         }
 

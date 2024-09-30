@@ -8,7 +8,7 @@ namespace YuoTools.Main.Ecs
         /// <summary>
         /// 是否关闭系统的 Try-Catch
         /// </summary>
-        public const bool CloseSystemTry = false;
+        public static bool CloseSystemTry = false;
 
         /// <summary>
         /// YuoWorld 的单例实例

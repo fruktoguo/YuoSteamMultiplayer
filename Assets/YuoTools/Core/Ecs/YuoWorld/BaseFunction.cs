@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Sirenix.OdinInspector;
 
 namespace YuoTools.Main.Ecs
 {
@@ -54,6 +55,7 @@ namespace YuoTools.Main.Ecs
             systemsOfComponent.Remove(system.GetType());
         }
 
+        [ShowInInspector]
         private List<YuoEntity> entityTrashTemp = new();
         private List<YuoComponent> componentsTrashTemp = new();
 
@@ -66,6 +68,8 @@ namespace YuoTools.Main.Ecs
 
             componentsTrashTemp.Clear();
             componentsTrashTemp.AddRange(componentsTrash);
+            componentsTrash.Clear();
+            
             foreach (var yuoComponent in componentsTrashTemp)
             {
                 yuoComponent.Dispose();
@@ -73,13 +77,12 @@ namespace YuoTools.Main.Ecs
 
             entityTrashTemp.Clear();
             entityTrashTemp.AddRange(entityTrash);
+            entityTrash.Clear();
+            
             foreach (var entity in entityTrashTemp)
             {
                 entity.Dispose();
             }
-
-            entityTrash.Clear();
-            componentsTrash.Clear();
         }
 
         /// <summary>

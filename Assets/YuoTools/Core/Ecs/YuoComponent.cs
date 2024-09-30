@@ -97,7 +97,7 @@ namespace YuoTools.Main.Ecs
 
         public static bool operator false(YuoComponent component)
         {
-            return component is not { IsDisposed: not true };
+            return component is not { IsDisposed: false };
         }
 
         public static bool operator !(YuoComponent component)
@@ -119,7 +119,6 @@ namespace YuoTools.Main.Ecs
             YuoWorld.RunSystemOfBase<T>(this);
         }
 
-        //
         // public static bool operator ==(YuoComponent left, object right)
         // {
         //     return right?.Equals(left) ?? left is null || left.IsDisposed;

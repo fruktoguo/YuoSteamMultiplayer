@@ -30,6 +30,7 @@ namespace Game
         [ObserversRpc]
         void RpcGameStart()
         {
+            $"收到Rpc消息 {nameof(RpcGameStart)}".Log();
             OnGameStart?.Invoke();
         }
 

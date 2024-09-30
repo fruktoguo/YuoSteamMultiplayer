@@ -34,6 +34,7 @@ namespace YuoTools.UI
 
         public void SetReady(bool isReady)
         {
+            IsReady = isReady;
             Button_Ready.image.color = IsReady ? Color.green : Color.red;
             TextMeshProUGUI_ReadyText.text = IsReady ? "已准备" : "未准备";
         }
