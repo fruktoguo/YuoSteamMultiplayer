@@ -49,6 +49,7 @@ namespace YuoTools.UI
         {
             view.FindAll();
             await YuoWait.WaitUntilAsync(() => view.player != null);
+            view.Button_Ready.interactable = view.player.player.IsOwner;
             if (view.player.player.IsOwner)
             {
                 view.Button_Ready.SetBtnClick(view.OnClick_Ready);

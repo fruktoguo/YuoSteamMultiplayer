@@ -1,4 +1,3 @@
-using System;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine.Events;
@@ -7,8 +6,6 @@ using YuoTools;
 public class PlayerReadySync : NetworkBehaviour
 {
     public readonly SyncVar<bool> syncValue = new();
-
-    public bool IsReady;
 
     public UnityEvent<bool> onReadyChange = new();
 
@@ -24,13 +21,13 @@ public class PlayerReadySync : NetworkBehaviour
 
     private void OnValueChange(bool prev, bool next, bool asServer)
     {
+        $"{gameObject.name} Ready: {next}".Log();
         onReadyChange?.Invoke(next);
     }
 
     public void SetValue(bool value)
     {
-        IsReady = value;
-        ServerValueChangeRpc();
+        ServerValueChangeRpc(value);
     }
 
     public bool GetValue()
@@ -39,8 +36,9 @@ public class PlayerReadySync : NetworkBehaviour
     }
 
     [ServerRpc]
-    void ServerValueChangeRpc()
+    void ServerValueChangeRpc(bool isReady)
     {
-        syncValue.Value = IsReady;
+        $"服务器 收到 {gameObject.name} 消息 Ready {isReady}".Log();
+        syncValue.Value = isReady;
     }
 }
