@@ -3,8 +3,9 @@ using DG.Tweening;
 using FishNet;
 using FishNet.Managing;
 using Game;
-using Sirenix.OdinInspector;
+using Game.Event;
 using SteamAPI.SteamHelper;
+using UniFramework.Event;
 using YuoTools.Extend.Helper;
 using YuoTools.Main.Ecs;
 
@@ -34,13 +35,12 @@ namespace YuoTools.UI
             playerViews.Add(component, player);
         }
 
-        [ShowInInspector]
         public Dictionary<NetPlayerComponent, View_PlayerReadyComponent> playerViews = new();
 
         public void PlayerExit(NetPlayerComponent component)
         {
-            View_PlayerReadyComponent view = playerViews[component];
-            view.Entity.Destroy();
+            View_PlayerReadyComponent player = playerViews[component];
+            player.Entity.Destroy();
             playerViews.Remove(component);
         }
 
@@ -55,6 +55,11 @@ namespace YuoTools.UI
             }
 
             GameManager.Instance.StartGame();
+        }
+        
+        public void OnCloseView(IEventMessage startEvent)
+        {
+            this.CloseView();
         }
     }
 
@@ -101,18 +106,19 @@ namespace YuoTools.UI
                 view.TextMeshProUGUI_Title.text = lobby.LobbyName;
                 view.Button_StartGame.gameObject.SetActive(InstanceFinder.IsServerStarted);
             }
-
-            GameManager.Instance.OnGameStart.AddListener(view.CloseView);
+            UniEvent.AddListener<S2C_StartEvent>(view.OnCloseView); 
         }
-    }
+        
 
+    }
+ 
     public class ViewGameReadyCloseSystem : YuoSystem<View_GameReadyComponent>, IUIClose
     {
         public override string Group => "UI/GameReady";
 
         protected override void Run(View_GameReadyComponent view)
-        {
-            GameManager.Instance.OnGameStart.RemoveListener(view.CloseView);
+        { 
+            UniEvent.RemoveListener<S2C_StartEvent>(view.OnCloseView);
         }
     }
 

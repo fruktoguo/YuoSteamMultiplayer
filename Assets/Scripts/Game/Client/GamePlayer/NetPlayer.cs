@@ -166,16 +166,33 @@ namespace Game.Client.GamePlayer
             // 判断输入是否超过阈值
             if (direction.sqrMagnitude >= inputThreshold * inputThreshold)
             {
-                inputDirection = direction;
+                inputDirection = CameraRelativeDirection(direction);
 
                 // 计算旋转状态
-                CalculateRotationState(direction);
+                CalculateRotationState(inputDirection);
             }
             else
             {
                 inputDirection = Vector3.zero;
                 rotationState = 0f; // 没有输入时，不旋转
             }
+        }
+        
+        private Vector3 CameraRelativeDirection(Vector3 direction)
+        {
+            // 获取当前相机的方向
+            Vector3 forward = CameraManager.Instance.playerFollowCamera.transform.forward;
+            Vector3 right = CameraManager.Instance.playerFollowCamera.transform.right;
+
+            // 确保只在水平面上计算
+            forward.y = 0;
+            right.y = 0;
+            forward.Normalize();
+            right.Normalize();
+
+            // 根据相机方向调整输入方向
+            Vector3 relativeDirection = forward * direction.z + right * direction.x;
+            return relativeDirection.normalized;
         }
 
         /// <summary>
@@ -185,8 +202,11 @@ namespace Game.Client.GamePlayer
         /// <param name="direction">输入方向</param>
         private void CalculateRotationState(Vector3 direction)
         {
-            Vector3 forward = rb.transform.forward;
+            Vector3 forward = CameraManager.Instance.playerFollowCamera.transform.forward;
             Vector3 inputDir = direction;
+            
+            forward.y = 0; // 确保只在水平面上计算
+            forward.Normalize();
 
             // 计算玩家前向与输入方向之间的有符号角度
             float angle = Vector3.SignedAngle(forward, inputDir, Vector3.up);
@@ -226,7 +246,7 @@ namespace Game.Client.GamePlayer
                 // 使用平滑插值移动位置
                 rb.MovePosition(Vector3.Lerp(rb.position, newPosition, positionLerpSpeed * Time.fixedDeltaTime));
             }
-        }
+        }  
 
         /// <summary>
         /// 处理玩家的旋转。
@@ -253,7 +273,7 @@ namespace Game.Client.GamePlayer
 
             // 应用旋转，使用 RotateTowards 保证旋转方向的一致性
             rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, newRotation, rotationSpeed * Time.fixedDeltaTime));
-        }
+        } 
 
         /// <summary>
         /// 更新动画参数，根据移动速度和旋转状态。

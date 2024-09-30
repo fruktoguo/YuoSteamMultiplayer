@@ -2,7 +2,6 @@ using System;
 using Game.Manager;
 using SteamAPI.SteamHelper;
 using Steamworks;
-using UniFramework.Event;
 using YuoTools;
 using YuoTools.Extend;
 using YuoTools.Main.Ecs;
@@ -12,20 +11,16 @@ public class NetPlayerComponent : YuoComponent
     public PlayerClientManager player;
     public PlayerReadySync ready;
     public CSteamID steamID;
-    public Action onInitAction;
 }
 
 public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, IStart
 {
-    NetPlayerComponent _component;
-
     /// <summary>
     /// 说明：这里的链路不对，
     /// </summary>
     /// <param name="component"></param>
     protected override async void Run(NetPlayerComponent component)
     {
-        _component = component;
         var player = component.player;
         component.AddComponent<EntitySelectComponent>().SelectGameObject = player.gameObject;
         component.ready ??= player.gameObject.GetComponent<PlayerReadySync>();
@@ -56,7 +51,6 @@ public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, ISta
             $"玩家 {component.Entity.EntityName}({steamID})--ownerID:{player.OwnerId} 加入房间".Log();
         }
 
-        component.onInitAction?.Invoke();
         component.Entity.RunSystem<INetPlayerAwake>();
     }
 }
