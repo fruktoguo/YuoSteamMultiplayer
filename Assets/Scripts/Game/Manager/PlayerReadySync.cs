@@ -8,6 +8,8 @@ public class PlayerReadySync : NetworkBehaviour
 {
     public readonly SyncVar<bool> syncValue = new();
 
+    public bool IsReady;
+
     public UnityEvent<bool> onReadyChange = new();
 
     private void Awake()
@@ -27,7 +29,8 @@ public class PlayerReadySync : NetworkBehaviour
 
     public void SetValue(bool value)
     {
-        ServerValueChangeRpc(value);
+        IsReady = value;
+        ServerValueChangeRpc();
     }
 
     public bool GetValue()
@@ -36,8 +39,8 @@ public class PlayerReadySync : NetworkBehaviour
     }
 
     [ServerRpc]
-    void ServerValueChangeRpc(bool value)
+    void ServerValueChangeRpc()
     {
-        syncValue.Value = value;
+        syncValue.Value = IsReady;
     }
 }
