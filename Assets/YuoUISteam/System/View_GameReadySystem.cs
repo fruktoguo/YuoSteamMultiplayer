@@ -54,7 +54,7 @@ namespace YuoTools.UI
                 }
             }
 
-            GameManager.Instance.StartGame();
+            GameManager.Instance?.StartGame();
         }
         
         public void OnCloseView(IEventMessage startEvent)

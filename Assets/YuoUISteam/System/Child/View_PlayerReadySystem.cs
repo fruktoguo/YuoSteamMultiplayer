@@ -55,6 +55,8 @@ namespace YuoTools.UI
             {
                 view.Button_Ready.SetBtnClick(view.OnClick_Ready);
             }
+            
+            view.SetReady(view.player.ready.GetValue());
 
             view.player.ready.onReadyChange.AddListener(view.SetReady);
         }
