@@ -73,20 +73,20 @@ namespace Game.Client.GamePlayer
         public override void OnStartClient()
         {
             base.OnStartClient();
+            var steamID = SteamAPIManager.Instance.GetMemberSteamId(OwnerId);
+            if (steamID != default)
+            { 
+                var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
+                _NameText.text = friendPersonaName;
+            }
+            else
+            {
+                _NameText.text = "没有取到";
+            }
+            
             if (IsOwner)
             {
-                CameraManager.Instance.SetFollowTarget(transform);   // 先临时这么写
-                
-                var steamID = SteamAPIManager.Instance.GetMemberSteamId(OwnerId);
-                if (steamID != default)
-                { 
-                    var friendPersonaName = SteamFriendsHelper.GetFriendPersonaName(steamID);
-                    _NameText.text = friendPersonaName;
-                }
-                else
-                {
-                    _NameText.text = "没有取到";
-                }
+                CameraManager.Instance.SetFollowTarget(transform);   // 先临时这么写 
             }
         } 
 
@@ -301,19 +301,18 @@ namespace Game.Client.GamePlayer
         private void OnCollisionEnter(Collision other)
         {
             if (!IsOwner) return;
+            
+            if (other.gameObject.CompareTag($"Enemy_Cube"))
             {
-                if (other.gameObject.CompareTag($"Enemy_Cube"))
-                {
-                    S_OnCollisionServer(other.gameObject); 
-                }
+                Despawn(other.gameObject);
+                S_OnCollisionServer(); 
             }
         }
 
         [ServerRpc]
-        private void S_OnCollisionServer(GameObject other)
+        private void S_OnCollisionServer()
         {
-            EatCount.Value++;
-            Destroy(other);
+            EatCount.Value++; 
         }
 
         private void OnDestroy()
