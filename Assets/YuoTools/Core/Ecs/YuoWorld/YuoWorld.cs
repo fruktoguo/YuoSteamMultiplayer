@@ -110,18 +110,4 @@ namespace YuoTools.Main.Ecs
         /// </summary>
         private bool _worldIsDestroy;
     }
-
-    /// <summary>
-    /// 场景组件类
-    /// </summary>
-    public class SceneComponent : YuoComponent
-    {
-    }
-
-    /// <summary>
-    /// YuoWorld主组件类
-    /// </summary>
-    public class YuoWorldMainComponent : YuoComponent
-    {
-    }
 }

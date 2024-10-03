@@ -3,14 +3,20 @@ using Game.Manager;
 using SteamAPI.SteamHelper;
 using Steamworks;
 using YuoTools;
+using YuoTools.Core.Ecs;
 using YuoTools.Extend;
 using YuoTools.Main.Ecs;
 
-public class NetPlayerComponent : YuoComponent
+public class NetPlayerComponent : YuoComponent, IComponentInit<PlayerClientManager>
 {
     public PlayerClientManager player;
     public PlayerReadySync ready;
     public CSteamID steamID;
+
+    public void ComponentInit(PlayerClientManager componentInitData)
+    {
+        player = componentInitData;
+    }
 }
 
 public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, IStart
@@ -52,5 +58,6 @@ public class NetPlayerComponentStartSystem : YuoSystem<NetPlayerComponent>, ISta
         }
 
         component.Entity.RunSystem<INetPlayerAwake>();
+        await YuoWait.WaitUntilAsync(() => component.player.OwnerId.Log() != 0);
     }
 }

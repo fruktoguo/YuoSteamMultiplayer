@@ -43,13 +43,20 @@ namespace YuoTools.Main.Ecs
         public void OnDestroy()
         {
             _worldIsDestroy = true;
-            // 退出前执行 ExitGame 系统
-            RunSystemForAllEntity<IExitGame>();
-
-            // 销毁所有实体
-            foreach (var entity in Entities.Values.ToList())
+            try
             {
-                entity?.Dispose();
+                // 退出前执行 ExitGame 系统
+                RunSystemForAllEntity<IExitGame>();
+
+                // 销毁所有实体
+                foreach (var entity in Entities.Values.ToList())
+                {
+                    entity?.Dispose();
+                }
+            }
+            catch (Exception e)
+            {
+                $"Game Exit Error {e}".LogError();
             }
 
             // 清理所有集合

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using YuoTools.Core.Ecs;
 
 namespace YuoTools.Main.Ecs
 {
@@ -13,7 +14,7 @@ namespace YuoTools.Main.Ecs
         public MultiHashSetMap<Type, YuoComponent> ChildComponents { get; private set; } = new();
         public MultiMap<Type, YuoComponent> BaseComponents { get; private set; } = new();
 
-        public List<YuoEntity> Children { get; } = new();
+        public HashSet<YuoEntity> Children { get; } = new();
 
         /// <summary>
         ///  获取所有子Entity,包括子Entity的子Entity
@@ -167,22 +168,22 @@ namespace YuoTools.Main.Ecs
         {
             return Components.ContainsKey(typeof(T));
         }
-        
+
         public bool HasBaseComponent<T>() where T : YuoComponent
         {
             return BaseComponents.ContainsKey(typeof(T));
         }
-        
+
         public bool HasComponent(Type type)
         {
             return Components.ContainsKey(type);
         }
-        
+
         public bool HasBaseComponent(Type type)
         {
             return BaseComponents.ContainsKey(type);
         }
-        
+
         /// <summary>
         ///  替换Component
         /// </summary>
@@ -216,15 +217,6 @@ namespace YuoTools.Main.Ecs
             return component;
         }
 
-        public YuoComponent AddComponent(Type type, Action<YuoComponent> onAwakeBefore)
-        {
-            if (Components.ContainsKey(type)) return GetComponent(type);
-            if (Activator.CreateInstance(type) is not YuoComponent component) return null;
-            onAwakeBefore?.Invoke(component);
-            AddComponent(type, component);
-            return component;
-        }
-
         public T AddComponent<T>() where T : YuoComponent, new()
         {
             if (GetComponent<T>() != null) return GetComponent<T>();
@@ -233,17 +225,9 @@ namespace YuoTools.Main.Ecs
             return component;
         }
 
-        public T AddComponent<T>(Action<T> onAwakeBefore) where T : YuoComponent, new()
-        {
-            if (GetComponent<T>() != null) return GetComponent<T>();
-            T component = new T();
-            onAwakeBefore?.Invoke(component);
-            AddComponent(typeof(T), component);
-            return component;
-        }
-
         private void AddComponent(Type type, YuoComponent component)
         {
+            // $"{this} AddComponent:{component.Name}".Log();
             component.Entity = this;
             Components.TryAdd(type, component);
             YuoWorld.Instance.AddComponent(this, component);
@@ -252,9 +236,9 @@ namespace YuoTools.Main.Ecs
 
         void AddChildComponent(Type type, YuoComponent component)
         {
-            if (component == null) return;
+            if (component?.Entity == null) return;
             ChildComponents.AddItem(type, component);
-            if (!Children.Contains(component.Entity)) Children.Add(component.Entity);
+            Children.Add(component.Entity);
         }
 
         public void RemoveComponent<T>() where T : YuoComponent
@@ -346,6 +330,48 @@ namespace YuoTools.Main.Ecs
             return child;
         }
 
+        #region AddWithData
+
+        public YuoComponent AddComponentWithData<T2>(Type type, T2 componentInitData)
+        {
+            if (Components.ContainsKey(type)) return GetComponent(type);
+            if (Activator.CreateInstance(type) is not YuoComponent component) return null;
+            component.Entity = this;
+            if (component is IComponentInit<T2> init) init.ComponentInit(componentInitData);
+            AddComponent(type, component);
+            return component;
+        }
+
+        public YuoComponent AddChild<T2>(Type type, T2 componentInitData, long entityID = long.MinValue)
+        {
+            var child = entityID != long.MinValue ? new YuoEntity(entityID) : new YuoEntity();
+            child.Parent = this;
+            var component = child.AddComponentWithData(type, componentInitData);
+            AddChildComponent(type, component);
+            return component;
+        }
+
+        public T AddComponent<T, T2>(T2 componentInitData) where T : YuoComponent, IComponentInit<T2>, new()
+        {
+            if (GetComponent<T>() != null) return GetComponent<T>();
+            T component = new T();
+            component.Entity = this;
+            component.ComponentInit(componentInitData);
+            AddComponent(typeof(T), component);
+            return component;
+        }
+
+        public T AddChild<T, T2>(T2 componentInitData) where T : YuoComponent, IComponentInit<T2>, new()
+        {
+            var child = new YuoEntity();
+            child.Parent = this;
+            var component = child.AddComponent<T, T2>(componentInitData);
+            AddChildComponent(typeof(T), component);
+            return component;
+        }
+
+        #endregion
+
         public void RemoveChild(YuoEntity entity)
         {
             if (!IsDisposed)
@@ -430,30 +456,11 @@ namespace YuoTools.Main.Ecs
 
         #region Operator
 
-        public static bool operator true(YuoEntity entity)
-        {
-            return entity is { IsDisposed: false };
-        }
+        public static bool operator true(YuoEntity entity) => entity is { IsDisposed: false };
 
-        public static bool operator false(YuoEntity entity)
-        {
-            return entity is not { IsDisposed: not true };
-        }
+        public static bool operator false(YuoEntity entity) => entity is not { IsDisposed: false };
 
-        public static bool operator !(YuoEntity entity)
-        {
-            return entity is { IsDisposed: true };
-        }
-
-        // public static bool operator ==(YuoEntity left, object right)
-        // {
-        //     return right?.Equals(left) ?? left is null || left.IsDisposed;
-        // }
-        //
-        // public static bool operator !=(YuoEntity left, object right)
-        // {
-        //     return !(left == right);
-        // }
+        public static bool operator !(YuoEntity entity) => entity is not { IsDisposed: false };
 
         #endregion
 

@@ -5,6 +5,7 @@ using Game.Manager;
 using Steamworks;
 using UniFramework.Event;
 using UnityEngine;
+using YuoTools;
 using YuoTools.Main.Ecs;
 using Random = UnityEngine.Random;
 
@@ -19,8 +20,7 @@ public class PlayerClientManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient(); 
-        playerComponent = YuoWorld.Scene.AddChild<NetPlayerComponent>();
-        playerComponent.player = this;
+        playerComponent = YuoWorld.Scene.AddChild<NetPlayerComponent, PlayerClientManager>(this);
         AddListeners();
     }
 

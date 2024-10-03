@@ -90,20 +90,11 @@ namespace YuoTools.Main.Ecs
             IsDisposed = true;
         }
 
-        public static bool operator true(YuoComponent component)
-        {
-            return component is { IsDisposed: false };
-        }
+        public static bool operator true(YuoComponent component) => component is { IsDisposed: false };
 
-        public static bool operator false(YuoComponent component)
-        {
-            return component is not { IsDisposed: false };
-        }
+        public static bool operator false(YuoComponent component) => component is not { IsDisposed: false };
 
-        public static bool operator !(YuoComponent component)
-        {
-            return !(component is { IsDisposed: false });
-        }
+        public static bool operator !(YuoComponent component) => component is not { IsDisposed: false };
 
         /// <summary>
         ///  runSystem的简化调用

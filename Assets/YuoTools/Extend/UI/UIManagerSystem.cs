@@ -202,19 +202,18 @@ namespace YuoTools.UI
                 return null;
             }
 
-            //生成窗口
-            var component =
-                YuoWorld.Main.GetComponent<UIManagerComponent>().Entity
-                    .AddChild(type, IDGenerate.GetID(winName)) as UIComponent;
-            if (component == null) return null;
-
-            component.AddComponent<UIAutoExitComponent>();
-
             if (go == null) go = await Create(winName);
             if (go == null) return null;
 
-            //初始化窗口
-            component.rectTransform = go.transform as RectTransform;
+            var rect = go.transform as RectTransform;
+
+            //生成窗口
+            var component =
+                YuoWorld.Main.GetComponent<UIManagerComponent>().Entity
+                    .AddChild(type, rect, IDGenerate.GetID(winName)) as UIComponent;
+            if (component == null) return null;
+
+            component.AddComponent<UIAutoExitComponent>();
 
             //如果有动画组件就挂载动画组件
             if (go.TryGetComponent<UISetting>(out var uiSetting))

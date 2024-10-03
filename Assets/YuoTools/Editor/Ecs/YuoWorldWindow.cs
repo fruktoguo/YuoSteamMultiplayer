@@ -321,6 +321,7 @@ namespace YuoTools.Editor.Ecs
 
                     foreach (var child in entity.Children)
                     {
+                        if (!child) continue;
                         AddEntity(child, path + "/" + child.EntityName);
                     }
                 }
@@ -328,6 +329,7 @@ namespace YuoTools.Editor.Ecs
                 {
                     foreach (var child in entity.Children)
                     {
+                        if (!child) continue;
                         AddEntity(child, child.EntityName);
                     }
                 }
