@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using FishNet.Component.Animating;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
@@ -56,7 +56,8 @@ namespace Game.Client.GamePlayer
 
         // 旋转状态，同步变量，范围在-1到1之间
         private float rotationState = 0f;
-
+        
+        public PlayerCamera playerCamera; 
         private void Awake()
         {
             // 获取必要的组件
@@ -83,11 +84,7 @@ namespace Game.Client.GamePlayer
             {
                 _NameText.text = "没有取到";
             }
-            
-            if (IsOwner)
-            {
-                CameraManager.Instance.SetFollowTarget(transform);   // 先临时这么写 
-            }
+            playerCamera.SetOwnerCamera(IsOwner);
         } 
 
         private void AddArgsChangeEvent()
@@ -118,8 +115,8 @@ namespace Game.Client.GamePlayer
 
         private void Update()
         {
-            if (!IsOwner) return;
-
+            if (!IsOwner) return; 
+            HandleMovementAndRotation();
             HandleInput();
             UpdateAnimator();
             HandleModelInput();
@@ -145,10 +142,9 @@ namespace Game.Client.GamePlayer
 
         private void FixedUpdate()
         {
-            if (!IsOwner) return;
-
-            HandleMovement();
-            HandleRotation();
+            if (!IsOwner) return; 
+            // HandleMovement(); 
+            // HandleRotation();
         }
 
         /// <summary>
@@ -181,8 +177,8 @@ namespace Game.Client.GamePlayer
         private Vector3 CameraRelativeDirection(Vector3 direction)
         {
             // 获取当前相机的方向
-            Vector3 forward = CameraManager.Instance.playerFollowCamera.transform.forward;
-            Vector3 right = CameraManager.Instance.playerFollowCamera.transform.right;
+            Vector3 forward = playerCamera.MainCamera.transform.forward;
+            Vector3 right = playerCamera.MainCamera.transform.right;
 
             // 确保只在水平面上计算
             forward.y = 0;
@@ -202,7 +198,7 @@ namespace Game.Client.GamePlayer
         /// <param name="direction">输入方向</param>
         private void CalculateRotationState(Vector3 direction)
         {
-            Vector3 forward = CameraManager.Instance.playerFollowCamera.transform.forward;
+            Vector3 forward = playerCamera.MainCamera.transform.forward;
             Vector3 inputDir = direction;
             
             forward.y = 0; // 确保只在水平面上计算
@@ -232,6 +228,39 @@ namespace Game.Client.GamePlayer
             // Debug.Log($"Rotation State: {rotationState}, Angle: {angle}");
         }
 
+
+        /// <summary>
+        /// 暂时先用这个
+        /// </summary>
+        private void HandleMovementAndRotation()
+        {
+            // 获取水平和垂直输入（例如：键盘的A/D和W/S键）
+            float moveHorizontal = Input.GetAxisRaw("Horizontal");
+            float moveVertical = Input.GetAxisRaw("Vertical");
+
+            var direction = new Vector3(moveHorizontal, 0, moveVertical).normalized;
+
+            if (direction.sqrMagnitude >= inputThreshold * inputThreshold)
+            {
+                Vector3 forward = Vector3.Scale(playerCamera.MainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Vector3 right = Vector3.Scale(playerCamera.MainCamera.transform.right, new Vector3(1, 0, 1)).normalized;
+    
+                // 设定移动向量为按摄像机方向的左右与上下
+                Vector3 move = moveVertical * forward + moveHorizontal * right;  
+                Vector3 movement = move * moveSpeed * Time.fixedDeltaTime;
+                Vector3 newPosition = rb.position + movement;
+
+                // 使用平滑插值移动位置
+                rb.MovePosition(Vector3.Lerp(rb.position, newPosition, positionLerpSpeed * Time.fixedDeltaTime)); 
+                if (move != Vector3.zero) 
+                {
+                    Quaternion toRotation = Quaternion.LookRotation(move, Vector3.up);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+                }
+            } 
+        }
+        
+        
         /// <summary>
         /// 处理玩家的移动。
         /// </summary>
@@ -304,15 +333,15 @@ namespace Game.Client.GamePlayer
             
             if (other.gameObject.CompareTag($"Enemy_Cube"))
             {
-                Despawn(other.gameObject);
-                S_OnCollisionServer(); 
+                S_OnCollisionServer(other.gameObject); 
             }
         }
 
         [ServerRpc]
-        private void S_OnCollisionServer()
+        private void S_OnCollisionServer(GameObject obj)
         {
             EatCount.Value++; 
+            Despawn(obj);
         }
 
         private void OnDestroy()
