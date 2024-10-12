@@ -56,6 +56,36 @@ namespace YuoTools.Editor.Ecs
             }
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            EditorApplication.update += OnUpdate;
+            EditorApplication.playModeStateChanged += OnEditorApplicationOnplayModeStateChanged;
+        }
+
+        async void OnEditorApplicationOnplayModeStateChanged(PlayModeStateChange mode)
+        {
+            if (mode == PlayModeStateChange.EnteredPlayMode)
+            {
+                ForceMenuTreeRebuild();
+                
+                await Task.Delay(100);
+                
+                ForceMenuTreeRebuild();
+            }
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            EditorApplication.update -= OnUpdate;
+            EditorApplication.playModeStateChanged -= OnEditorApplicationOnplayModeStateChanged;
+        }
+
+        void OnUpdate()
+        {
+            Repaint();
+        }
 
         protected override void OnImGUI()
         {
@@ -88,11 +118,11 @@ namespace YuoTools.Editor.Ecs
             GUILayout.EndHorizontal();
             if (_isEntities)
             {
-                SearchEntity = GUILayout.TextField(SearchEntity, (GUIStyle)"SearchTextField");
+                SearchEntity = GUILayout.TextField(SearchEntity, "SearchTextField");
             }
             else
             {
-                SearchSystem = GUILayout.TextField(SearchSystem, (GUIStyle)"SearchTextField");
+                SearchSystem = GUILayout.TextField(SearchSystem, "SearchTextField");
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("排序方式");
                 RankDirection = GUILayout.Toggle(RankDirection, "↑↓", EditorStyles.toolbarButton,
@@ -113,12 +143,6 @@ namespace YuoTools.Editor.Ecs
             }
 
             base.OnImGUI();
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        public void ForceRebuild()
-        {
-            ForceMenuTreeRebuild();
         }
 
         private void Update()

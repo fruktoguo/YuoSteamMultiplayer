@@ -17,30 +17,35 @@ namespace YuoTools.Editor
         private static void OpenWindow()
         {
             var window = GetWindow<YuoToolsManager>();
+
             window.titleContent = new GUIContent("YuoTools Manager");
-            window.minSize = new Vector2(620, 100);
-            window.maxSize = new Vector2(621, 101);
+            window.minSize = new Vector2(625, 125);
+            window.maxSize = new Vector2(626, 126);
             window.Show();
         }
 
         private string _cachedFolderSize;
-        private long _lastWriteTime;
+        private string _lastWriteTime;
+        private string _localWriteTime;
 
-        public const string Path = @"C:\YuoTools\Main";
+        public const string FilePath = @"C:\YuoTools\Main";
         public const string BackupPath = @"C:\YuoTools\Backup";
 
         string LocalPath => $"{Application.dataPath}/YuoTools";
 
+        GUIStyle labelStyle;
+        GUIStyle buttonStyle;
+
         private void OnGUI()
         {
-            GUIStyle labelStyle = new GUIStyle(EditorStyles.label)
+            labelStyle ??= new GUIStyle(EditorStyles.label)
             {
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 normal = { textColor = Color.gray }
             };
 
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+            buttonStyle ??= new GUIStyle(GUI.skin.button)
             {
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
@@ -52,10 +57,13 @@ namespace YuoTools.Editor
                 padding = new RectOffset(10, 10, 10, 10)
             };
 
-            EditorGUILayout.LabelField("最后修改时间", GetLastWriteTime(), labelStyle);
+            _localWriteTime = ReadTime(LocalPath);
+            EditorGUILayout.LabelField("最后修改时间", GetNewWriteTime(), labelStyle);
+            EditorGUILayout.LabelField("本地最后修改时间", _localWriteTime, labelStyle);
             EditorGUILayout.LabelField("文件夹大小", GetCachedFolderSize(), labelStyle);
 
             EditorGUILayout.BeginHorizontal(); // 开始水平布局
+
 
             if (GUILayout.Button("上传", buttonStyle))
             {
@@ -64,18 +72,18 @@ namespace YuoTools.Editor
 
             string downloadButtonText;
             bool isUpdated = false;
-            if (Directory.Exists(Path))
+            if (Directory.Exists(FilePath))
             {
                 downloadButtonText = "更新";
-
-                if (GetLastWriteTime() != new DateTime(_lastWriteTime).ToString("yyyy-MM-dd HH:mm:ss"))
+                if (DateTime.TryParse(GetNewWriteTime(), out DateTime newWriteTime) &&
+                    DateTime.TryParse(_localWriteTime, out DateTime localWriteTime) && newWriteTime <= localWriteTime)
                 {
-                    downloadButtonText += " ⬆️";
-                    isUpdated = true;
+                    downloadButtonText += " √️";
                 }
                 else
                 {
-                    downloadButtonText += " ✔️";
+                    downloadButtonText += " ⬆️";
+                    isUpdated = true;
                 }
             }
             else
@@ -99,18 +107,12 @@ namespace YuoTools.Editor
             EditorGUILayout.EndHorizontal(); // 结束水平布局
         }
 
-
-        string GetLastWriteTime()
+        string GetNewWriteTime()
         {
             var time = "没有文件夹";
-            if (Directory.Exists(Path))
+            if (Directory.Exists(FilePath))
             {
-                var t = GetLastWriteTime(Path);
-                if (t > 0)
-                {
-                    var date = new System.DateTime(t);
-                    time = date.ToString("yyyy-MM-dd HH:mm:ss");
-                }
+                return ReadTime(FilePath);
             }
 
             return time;
@@ -118,12 +120,13 @@ namespace YuoTools.Editor
 
         string GetFolderSize()
         {
-            if (!Directory.Exists(Path))
+            if (!Directory.Exists(FilePath))
             {
                 return "没有文件夹";
             }
 
-            long size = Directory.GetFiles(Path, "*", SearchOption.AllDirectories).Sum(t => (new FileInfo(t)).Length);
+            long size = Directory.GetFiles(FilePath, "*", SearchOption.AllDirectories)
+                .Sum(t => (new FileInfo(t)).Length);
             return FormatSize(size);
         }
 
@@ -135,7 +138,7 @@ namespace YuoTools.Editor
             while (len >= 1024 && order < sizes.Length - 1)
             {
                 order++;
-                len = len / 1024;
+                len /= 1024;
             }
 
             return $"{len:0.##} {sizes[order]}";
@@ -143,7 +146,7 @@ namespace YuoTools.Editor
 
         string GetCachedFolderSize()
         {
-            var currentWriteTime = GetLastWriteTime(Path);
+            var currentWriteTime = ReadTime(FilePath);
             if (currentWriteTime != _lastWriteTime)
             {
                 _lastWriteTime = currentWriteTime;
@@ -153,6 +156,8 @@ namespace YuoTools.Editor
             return _cachedFolderSize;
         }
 
+        const int MaxBackupCount = 10; // 最大备份数量
+
         public async void Upload()
         {
             EditorUtility.DisplayProgressBar("上传", "正在上传文件...", 0.0f);
@@ -160,20 +165,40 @@ namespace YuoTools.Editor
             var timeoutTask = Task.Delay(30000, cts.Token); // 30秒超时
             var uploadTask = Task.Run(() =>
             {
-                FileHelper.CheckOrCreateDirectoryPath(Path);
-                var time = System.DateTime.Now.Ticks;
-                WriteTime(LocalPath, time);
-                FileHelper.CleanDirectory(Path);
-                FileHelper.CopyDirectory(LocalPath, Path);
-                WindowsHelper.OpenDirectory(Path);
-            });
+                // 获取所有备份目录
+                var backupDirs = Directory.GetDirectories(BackupPath)
+                    .OrderBy(Directory.GetCreationTime)
+                    .ToList();
+
+                // 删除多余的备份
+                while (backupDirs.Count >= MaxBackupCount)
+                {
+                    Directory.Delete(backupDirs[0], true);
+                    backupDirs.RemoveAt(0);
+                }
+
+                // 创建新的备份目录
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                string backupDir = Path.Combine(BackupPath, timestamp);
+                FileHelper.CheckOrCreateDirectoryPath(backupDir);
+
+                // 将当前本地文件夹内容复制到备份目录
+                FileHelper.CopyDirectory(LocalPath, backupDir);
+
+                // 清理主路径并复制新的文件
+                FileHelper.CheckOrCreateDirectoryPath(FilePath);
+                WriteTime(LocalPath, DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                FileHelper.CleanDirectory(FilePath);
+                FileHelper.CopyDirectory(LocalPath, FilePath);
+                WindowsHelper.OpenDirectory(FilePath);
+            }, cts.Token);
 
             float progress = 0.0f;
             while (!uploadTask.IsCompleted && !timeoutTask.IsCompleted)
             {
                 progress += 0.01f;
                 EditorUtility.DisplayProgressBar("上传", "正在上传文件...", progress);
-                await Task.Delay(100); // 每0.1秒更新一次进度条
+                await Task.Delay(100, cts.Token); // 每0.1秒更新一次进度条
             }
 
             var completedTask = await Task.WhenAny(uploadTask, timeoutTask);
@@ -191,16 +216,17 @@ namespace YuoTools.Editor
             _cachedFolderSize = GetFolderSize();
         }
 
+
         public async void Download()
         {
-            var sourceTime = GetLastWriteTime(Path);
-            if (sourceTime == 0)
+            var sourceTime = ReadTime(FilePath);
+            if (sourceTime.IsNullOrSpace())
             {
                 Debug.Log("没有找到YuoTools文件夹");
                 return;
             }
 
-            var localTime = GetLastWriteTime(LocalPath);
+            var localTime = ReadTime(LocalPath);
             if (sourceTime == localTime)
             {
                 var isConfirm = EditorUtility.DisplayDialog("提示", "本地YuoTools文件夹已经是最新版本,确认重新下载？", "覆盖", "取消");
@@ -227,16 +253,16 @@ namespace YuoTools.Editor
                 FileHelper.CleanDirectory(BackupPath);
                 FileHelper.CopyDirectory(LocalPath, BackupPath);
                 FileHelper.CleanDirectory(LocalPath);
-                FileHelper.CopyDirectory(Path, LocalPath);
+                FileHelper.CopyDirectory(FilePath, LocalPath);
                 return Task.CompletedTask;
-            });
+            }, cts.Token);
 
             float progress = 0.0f;
             while (!downloadTask.IsCompleted && !timeoutTask.IsCompleted)
             {
                 progress += 0.01f;
                 EditorUtility.DisplayProgressBar("下载", "正在下载文件...", progress);
-                await Task.Delay(100); // 每0.1秒更新一次进度条
+                await Task.Delay(100, cts.Token); // 每0.1秒更新一次进度条
             }
 
             var completedTask = await Task.WhenAny(downloadTask, timeoutTask);
@@ -250,33 +276,32 @@ namespace YuoTools.Editor
             }
 
             EditorUtility.ClearProgressBar();
+            
+            //刷新
+            AssetDatabase.Refresh();
         }
 
         const string WriteTimePath = "WriteTime.txt";
 
-        long GetLastWriteTime(string path)
+        string ReadTime(string path)
         {
             if (!Directory.Exists(path))
             {
-                return 0;
+                return "";
             }
 
             var readmePath = $"{path}/{WriteTimePath}";
             FileHelper.CheckOrCreateFile(readmePath);
             var readme = FileHelper.ReadAllText(readmePath);
-            if (string.IsNullOrEmpty(readme))
-            {
-                return 0;
-            }
 
-            return long.Parse(readme);
+            return readme;
         }
 
-        void WriteTime(string path, long time)
+        void WriteTime(string path, string time)
         {
             var readmePath = $"{path}/{WriteTimePath}";
             FileHelper.CheckOrCreateFile(readmePath);
-            FileHelper.WriteAllText(readmePath, time.ToString());
+            FileHelper.WriteAllText(readmePath, time);
         }
     }
 }
