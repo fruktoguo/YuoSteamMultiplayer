@@ -32,7 +32,7 @@ namespace RTSGame
         // 这个state只是标记状态，并不是状态机，  状态机应该由单个角色去添加
         public void SetState(UnitState newState)
         {
-             
+            
         }
 
         public void TakeDamage(int damage)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTSGame
@@ -17,7 +18,12 @@ namespace RTSGame
 
         public void Move(Vector3 destination)
         {
-             
+            
+        }
+
+        public List<ISkill> Skills { get; }
+        public void UseSkill(ISkill skillData)
+        { 
         }
     }
 }

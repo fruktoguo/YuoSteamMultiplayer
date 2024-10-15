@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace RTSGame
 {
     public interface ICanDef
@@ -5,9 +7,10 @@ namespace RTSGame
         void Def(IAttackData attackData);
     }
 
-    public interface IHaveSkill
+    public interface ICanUseSkill
     {
-         
+        List<ISkill> Skills { get; }
+        void UseSkill(ISkill skillData);
     }
     
     // TODO: 关于攻击，类似这种东西都当做技能来处理

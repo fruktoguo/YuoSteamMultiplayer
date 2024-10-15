@@ -6,7 +6,7 @@ namespace RTSGame
         public float MovementSpeed { get; protected set; }
     }
     
-    public interface ICharacter : IUnit, IHaveSkill, ICanDef
+    public interface ICharacter : IUnit, ICanUseSkill, ICanDef
     {
         // 角色自己的一些方法
         void Move(UnityEngine.Vector3 destination);
