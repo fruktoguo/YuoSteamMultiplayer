@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.IO;
 
-public partial class YuoToolsSettings : ScriptableObject
+public partial class YuoToolsSettingsHelper
 {
     // 配置文件存放路径
     private static string GetSettingsPath()
@@ -9,7 +9,6 @@ public partial class YuoToolsSettings : ScriptableObject
         return $"ProjectSettings/YuoToolsSettings.json";
     }
 
-    // 获取或创建设置文件实例
     public static YuoToolsSettings GetOrCreateSettings()
     {
 #if UNITY_EDITOR
@@ -24,15 +23,18 @@ public partial class YuoToolsSettings : ScriptableObject
         else
         {
             // 如果文件不存在，创建一个新的实例
-            settings = CreateInstance<YuoToolsSettings>();
+            settings = ScriptableObject.CreateInstance<YuoToolsSettings>();
             SaveSettings(settings);
         }
+
+        // 确保设置对象名称
+        settings.name = "YuoToolsSettings";
 
         SaveResource(settings);
 
         return settings;
 #else
-        return Resources.Load<YuoToolsSettings>("YuoToolsSettings");
+    return Resources.Load<YuoToolsSettings>("YuoToolsSettings");
 #endif
     }
 
@@ -40,15 +42,35 @@ public partial class YuoToolsSettings : ScriptableObject
     {
 #if UNITY_EDITOR
         var path = "Assets/Resources/YuoToolsSettings.asset";
-        //保存到Resources文件夹
-        //如果文件不存在就创建,存在则覆盖
-        if (File.Exists(path))
+
+        // 确保Resources文件夹存在
+        if (!Directory.Exists("Assets/Resources"))
         {
-            UnityEditor.AssetDatabase.DeleteAsset(path);
+            Directory.CreateDirectory("Assets/Resources");
         }
 
-        UnityEditor.AssetDatabase.CreateAsset(settings, path);
+        // 再次确保设置对象名称
+        if (string.IsNullOrEmpty(settings.name))
+        {
+            settings.name = "YuoToolsSettings";
+        }
+
+        // 检查文件是否已存在
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<YuoToolsSettings>(path) == null)
+        {
+            // 如果文件不存在，创建新的资源文件
+            UnityEditor.AssetDatabase.CreateAsset(settings, path);
+        }
+        else
+        {
+            // 如果文件已存在，更新现有资源
+            UnityEditor.EditorUtility.CopySerialized(settings,
+                UnityEditor.AssetDatabase.LoadAssetAtPath<YuoToolsSettings>(path));
+        }
+
+        // 保存所有资源更改
         UnityEditor.AssetDatabase.SaveAssets();
+        UnityEditor.AssetDatabase.Refresh();
 #endif
     }
 

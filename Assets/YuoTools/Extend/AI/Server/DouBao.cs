@@ -12,67 +12,6 @@ namespace YuoTools.Extend.AI
     {
         public const string URL = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
 
-        static async Task GetAwaiter(AsyncOperation asyncOperation)
-        {
-            var task = new TaskCompletionSource<bool>();
-            asyncOperation.completed += _ => { task.SetResult(true); };
-            await task.Task;
-        }
-
-        static async IAsyncEnumerable<string> GetResponseStream(string body, List<(string, string)> headers = null)
-        {
-            if (AIHelper.ApiKey.IsNullOrSpace())
-            {
-                Debug.LogError("请输入ApiKey");
-                yield break;
-            }
-
-            UnityWebRequest webRequest = new UnityWebRequest(URL, "POST");
-
-            headers ??= new List<(string, string)>
-            {
-                ("Content-Type", "application/json"),
-                ("Authorization", $"Bearer {AIHelper.ApiKey}")
-            };
-            foreach (var header in headers)
-            {
-                webRequest.SetRequestHeader(header.Item1, header.Item2);
-            }
-
-            byte[] jsonToSend = new UTF8Encoding().GetBytes(body);
-            webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
-            webRequest.downloadHandler = new DownloadHandlerBuffer();
-            webRequest.disposeDownloadHandlerOnDispose = true;
-            webRequest.disposeUploadHandlerOnDispose = true;
-
-            $"Sending request to: {webRequest.url} with body: {body} and headers: ".Log();
-
-            var asyncOption = webRequest.SendWebRequest();
-            var messageDelay = 100;
-            int safeCount = 1000;
-            string result = "";
-            while (!asyncOption.isDone)
-            {
-                await Task.Delay(messageDelay);
-
-                string OnJson(ChatCompletionStreamResponse json)
-                {
-                    return json.choices[0].ToString();
-                }
-
-                result = OperateMessage(webRequest.downloadHandler.text, OnJson);
-                result = RemoveStartSpace(result);
-                yield return result;
-                if (safeCount-- < 0)
-                {
-                    Debug.LogError("请求超时");
-                    break;
-                }
-            }
-
-            webRequest.Dispose();
-        }
-
         public static async IAsyncEnumerable<string> GenerateStream(string prompt)
         {
             var model = AIHelper.AIModel;
@@ -82,17 +21,27 @@ namespace YuoTools.Extend.AI
                 yield break;
             }
 
-            var requestBody = new chatRequest(model, prompt)
+            var requestBody = new ChatCompletionRequest(model, prompt)
             {
                 stream = true
             };
             string body = JsonConvert.SerializeObject(requestBody);
-            await foreach (var line in GetResponseStream(body))
+
+            string OnJson(ChatCompletionStreamResponse json)
+            {
+                return json.choices[0].ToString();
+            }
+
+            string OnText(string text)
+            {
+                return OperateMessage(text, OnJson);
+            }
+
+            await foreach (var line in AIServerHelper.GetResponseStream(AIHelper.ApiKey, URL, body, OnText))
             {
                 if (line != null) yield return line;
             }
         }
-
 
         public static async Task<string> GenerateText(string prompt)
         {
@@ -103,75 +52,16 @@ namespace YuoTools.Extend.AI
                 return "模型不能为空";
             }
 
-            var requestBody = new chatRequest(model, prompt);
+            var requestBody = new ChatCompletionRequest(model, prompt);
 
             string body = JsonConvert.SerializeObject(requestBody);
-            var responseJson = await GetResponse(body);
+            var responseJson = await AIServerHelper.GetResponse(AIHelper.ApiKey, URL, body);
 
             if (string.IsNullOrEmpty(responseJson)) return "发生错误";
             var parsedJson = JsonConvert.DeserializeObject<ChatCompletionResponse>(responseJson);
             return parsedJson.choices[0].message.content;
         }
-
-        static async Task<string> GetResponse(string body, List<(string, string)> headers = null)
-        {
-            if (AIHelper.ApiKey.IsNullOrSpace())
-            {
-                Debug.LogError("请输入ApiKey");
-                return null;
-            }
-
-            UnityWebRequest webRequest = new UnityWebRequest(URL, "POST");
-
-            headers ??= new List<(string, string)>
-            {
-                ("Content-Type", "application/json"),
-                ("Authorization", $"Bearer {AIHelper.ApiKey}")
-            };
-            foreach (var header in headers)
-            {
-                webRequest.SetRequestHeader(header.Item1, header.Item2);
-            }
-
-            byte[] jsonToSend = new UTF8Encoding().GetBytes(body);
-            webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
-            webRequest.downloadHandler = new DownloadHandlerBuffer();
-            webRequest.disposeDownloadHandlerOnDispose = true;
-            webRequest.disposeUploadHandlerOnDispose = true;
-
-            await GetAwaiter(webRequest.SendWebRequest());
-
-            string result = "";
-            switch (webRequest.result)
-            {
-                case UnityWebRequest.Result.ConnectionError:
-                case UnityWebRequest.Result.DataProcessingError:
-                    Debug.LogError("Error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    Debug.LogError("HTTP Error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.Success:
-                    result = webRequest.downloadHandler.text;
-                    break;
-            }
-
-            webRequest.Dispose();
-            return result;
-        }
-
-        public static string RemoveStartSpace(string str)
-        {
-            int i = 0;
-            for (; i < str.Length; i++)
-            {
-                if (str[i] != ' ' && str[i] != '\n')
-                    break;
-            }
-
-            return str.Substring(i);
-        }
-
+        
         public static string OperateMessage(string str, Func<ChatCompletionStreamResponse, string> onJson)
         {
             string split = "data:";
@@ -278,7 +168,7 @@ namespace YuoTools.Extend.AI
         }
 
         [Serializable]
-        public class chatRequest
+        public class ChatCompletionRequest
         {
             public string model { get; set; }
             public bool stream { get; set; }
@@ -294,7 +184,7 @@ namespace YuoTools.Extend.AI
             // public int top_logprobs { get; set; } = 0;
             // public Dictionary<int, float> logit_bias { get; set; } = new();
 
-            public chatRequest(string model, string prompt)
+            public ChatCompletionRequest(string model, string prompt)
             {
                 this.model = model;
                 this.messages = new List<Message>

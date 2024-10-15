@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98cb14e6b5594d29a05ba9171943ae7f, type: 3}
   m_Name: YuoToolsSettings
   m_EditorClassIdentifier: 
-  AIApiKey: ac93ee32-a7b4-4910-bfc7-a58aed7f6152
-  AIServer: doubao
-  AIModel: ep-20240924155253-kv5b6
+  AISetting:
+    Server: 1
+    Servers:
+      mKeys:
+      - "\u667A\u8C31"
+      - "\u8C46\u5305"
+      mValues:
+      - APIKey: 7c0be4aec997124de7f92220eb1d6023.VPtDMotwNN262K49
+        Model: glm-4-flash
+      - APIKey: ac93ee32-a7b4-4910-bfc7-a58aed7f6152
+        Model: ep-20240924155253-kv5b6

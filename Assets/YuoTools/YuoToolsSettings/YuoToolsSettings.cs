@@ -1,8 +1,6 @@
 using UnityEngine;
 
-public partial class YuoToolsSettings
+public class YuoToolsSettings : ScriptableObject
 {
-    public string AIApiKey;
-    public string AIServer = "doubao";
-    public string AIModel = "";
+    public AISetting AISetting = new();
 }

@@ -1,4 +1,5 @@
 using UnityEditor;
+using YuoTools;
 
 public class YuoToolsSettingsProvider : SettingsProvider
 {
@@ -13,7 +14,7 @@ public class YuoToolsSettingsProvider : SettingsProvider
     public static SettingsProvider CreateYuoToolsSettingsProvider()
     {
         var provider = new YuoToolsSettingsProvider("Project/YuoTools Settings", SettingsScope.Project);
-        provider._settings = new SerializedObject(YuoToolsSettings.GetOrCreateSettings());
+        provider._settings = new SerializedObject(YuoToolsSettingsHelper.GetOrCreateSettings());
         return provider;
     }
 
@@ -23,28 +24,28 @@ public class YuoToolsSettingsProvider : SettingsProvider
 
         base.OnGUI(searchContext);
 
-        AutoDrawProperties(_settings);
+        DrawProperties(_settings);
 
         if (_settings.ApplyModifiedProperties())
         {
             // 当有更改时，保存设置
-            YuoToolsSettings.SaveSettings(_settings.targetObject as YuoToolsSettings);
+            YuoToolsSettingsHelper.SaveSettings(_settings.targetObject as YuoToolsSettings);
         }
     }
 
-    public static void AutoDrawProperties(SerializedObject serializedObject)
+    public static void DrawProperties(SerializedObject serializedObject)
     {
-        SerializedProperty property = serializedObject.GetIterator();
-        bool enterChildren = true;
-
-        while (property.NextVisible(enterChildren))
-        {
-            // 排除 m_Script 属性（这是Unity自动生成的脚本引用，不需要显示）
-            if (property.name == "m_Script")
-                continue;
-
-            EditorGUILayout.PropertyField(property, true);
-            enterChildren = false;
-        }
+        // SerializedProperty property = serializedObject.GetIterator();
+        // bool enterChildren = true;
+        //
+        // while (property.NextVisible(enterChildren))
+        // {
+        //     // 排除 m_Script 属性（这是Unity自动生成的脚本引用，不需要显示）
+        //     if (property.name == "m_Script")
+        //         continue;
+        //
+        //     EditorGUILayout.PropertyField(property, true);
+        //     enterChildren = false;
+        // }
     }
 }
