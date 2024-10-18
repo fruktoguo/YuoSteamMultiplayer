@@ -49,6 +49,8 @@ namespace YuoTools
         // Vector2 to Vector3
         public static Vector3 xy0(this Vector2 v) => new Vector3(v.x, v.y, 0);
 
+        public static Vector3 x0y(this Vector2 v) => new Vector3(v.x, 0, v.y);
+
         public static Vector3 xy1(this Vector2 v) => new Vector3(v.x, v.y, 1);
 
         public static Vector3 xz0(this Vector2 v, float yValue) => new Vector3(v.x, yValue, v.y);
@@ -60,6 +62,8 @@ namespace YuoTools
         public static Vector3 zx0(this Vector2 v, float yValue) => new Vector3(v.y, yValue, v.x);
 
         public static Vector3 zy0(this Vector2 v, float xValue) => new Vector3(xValue, v.y, v.x);
+
+        public static Vector3 x0y(this Vector2 v, float yValue) => new Vector3(v.x, yValue, v.y);
 
         // Vector2 to Vector4
         public static Vector4 xy00(this Vector2 v) => new Vector4(v.x, v.y, 0, 0);

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: YuoToolsSettings
   m_EditorClassIdentifier: 
   AISetting:
-    Server: 1
+    Server: 0
     Servers:
       mKeys:
       - "\u667A\u8C31"
