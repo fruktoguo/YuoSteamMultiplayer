@@ -20,6 +20,9 @@ namespace RTSGame
         {
             
         }
+        
+        
+        
 
         public List<ISkill> Skills { get; }
         public void UseSkill(ISkill skillData)
