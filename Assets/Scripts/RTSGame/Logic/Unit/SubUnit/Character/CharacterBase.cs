@@ -3,14 +3,19 @@ using UnityEngine;
 
 namespace RTSGame
 { 
-    public abstract class CharacterData : UnitData, ICharacterData
+    public class CharacterData : UnitData, ICharacterData
     {
-        float ICharacterData.MovementSpeed { get; set; }
+        public CharacterType CharacterType { get; protected set; } 
+        public float MovementSpeed { get; protected set; }
     }
-
     
     public abstract class CharacterBase : UnitBase , ICharacter
     {
+        protected CharacterBase(CharacterData data) : base(data)
+        {
+            
+        }
+
         public void Def(IAttackData attackData)
         {
             

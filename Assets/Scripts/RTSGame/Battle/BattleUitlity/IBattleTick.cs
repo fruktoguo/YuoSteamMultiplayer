@@ -1,4 +1,4 @@
-﻿namespace Game
+﻿namespace RTSGame
 {
     public interface IBattleTick
     {

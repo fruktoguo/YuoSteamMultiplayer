@@ -1,4 +1,4 @@
-﻿namespace Game
+﻿namespace RTSGame
 {
     public class SingletonClass<T> where T : class ,new()
     { 

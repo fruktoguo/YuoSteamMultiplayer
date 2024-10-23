@@ -14,10 +14,18 @@ namespace RTSGame
         None,               // 无
         Hero,               // 英雄
         Worker,             // 工人
-        Warrior,            // 战士
+        Soldier,            // 战士
         Archer,             // 弓箭手
         Mage                // 法师
     }
+    
+    public enum BuildingType
+    {
+        None,           // 无建筑 
+        Farm,               // 农场  
+        Barracks,           // 兵营 
+        Tower,              // 防御塔 
+    } 
     
     
     public enum UnitState

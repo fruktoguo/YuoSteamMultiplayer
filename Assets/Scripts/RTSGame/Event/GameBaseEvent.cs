@@ -1,9 +1,9 @@
 ﻿using System;
 using QFramework;
 
-namespace Game
+namespace RTSGame
 {
-    public class BattleBaseEvent<T> : IPoolable ,IPoolType where T : BattleBaseEvent<T>, new()
+    public class GameBaseEvent<T> : IPoolable ,IPoolType where T : GameBaseEvent<T>, new()
     {
         private static Func<T> FactoryMethod;
         public bool IsRecycled { get; set; }
@@ -12,7 +12,7 @@ namespace Game
             
         }
 
-        static BattleBaseEvent()
+        static GameBaseEvent()
         {
             FactoryMethod = () => new T();
             SafeObjectPool<T>.Instance.SetFactoryMethod(FactoryMethod);
