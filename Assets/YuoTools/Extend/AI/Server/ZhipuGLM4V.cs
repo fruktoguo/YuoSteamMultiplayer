@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using YuoTools.Extend.Helper;
 
 namespace YuoTools.Extend.AI
 {
@@ -61,7 +62,7 @@ namespace YuoTools.Extend.AI
                     webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
                     webRequest.downloadHandler = new DownloadHandlerBuffer();
 
-                    await webRequest.SendWebRequest();
+                    await webRequest.SendWebRequest().GetEtAwaiter();
 
                     if (webRequest.result != UnityWebRequest.Result.Success)
                     {
