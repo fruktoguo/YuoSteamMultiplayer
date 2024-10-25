@@ -31,6 +31,11 @@ namespace RTSGame
         {
             return FactoryMethod?.Invoke();
         }
+
+        public void SendEvent()
+        {
+            GameEventManager.SendEvent(this);
+        }
         
         public static T Allocate()
         {

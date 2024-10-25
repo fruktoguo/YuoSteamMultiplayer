@@ -8,24 +8,10 @@ namespace RTSGame
         {
             switch (buildingType)
             {
-                case BuildingType.Farm:    // TODO
-                    // return new BuildingData
-                    // {
-                    //     UnitType = UnitType.Building,
-                    //     Name = "Farm",
-                    //     MaxHp = 1000,
-                    //     Cost = 100,
-                    //     BuildTime = 30
-                    // };
+                case BuildingType.Farm:   
+                    return new FarmBuildingData(UnitType.Building, BuildingType.Farm, "Farm", 1000, 1000, 0, 100, 30, 1, 10);
                 case BuildingType.Barracks:
-                    // return new BuildingData
-                    // {
-                    //     UnitType = UnitType.Building,
-                    //     Name = "Barracks",
-                    //     MaxHp = 1500,
-                    //     Cost = 200,
-                    //     BuildTime = 45
-                    // };
+                    return new BarracksBuildingData(UnitType.Building, BuildingType.Barracks, "Barracks", 1500, 1500, 0, 200, 45, 1, 10);
                 default:
                     throw new ArgumentException("Unknown building type");
             }
@@ -36,15 +22,9 @@ namespace RTSGame
             switch (characterType)
             {
                 case CharacterType.Soldier:
-                    // return new CharacterData
-                    // {
-                    //     UnitType = UnitType.Character,
-                    //     CharacterType = CharacterType.Soldier,
-                    //     Name = "Soldier",
-                    //     MaxHp = 100,
-                    //     AtkNum = 10,
-                    //     MovementSpeed = 5f
-                    // };
+                    return new SoldierCharacterData(UnitType.Character, CharacterType.Soldier, 1.0f,"Soldier", 100, 100, 10, 50, 10, 1, 10);
+                case CharacterType.Worker:
+                    return new WorkerCharacterData(UnitType.Character, CharacterType.Worker, 1.0f,"Worker", 100, 100, 5, 30, 10, 1, 10);
                 default:
                     throw new ArgumentException("Unknown character type");
             }

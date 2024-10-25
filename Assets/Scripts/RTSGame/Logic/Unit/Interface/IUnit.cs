@@ -1,7 +1,9 @@
+using Unity.Mathematics;
+
 namespace RTSGame
 {
     public interface IUnitData
-    { 
+    {
         UnitType UnitType { get; }
         string Name { get;}
         int MaxHp { get; }
@@ -12,17 +14,7 @@ namespace RTSGame
         
         // 生命恢复速度
         int HpRecoverySpeed { get; }
-        int HpRecoveryValue { get; }
-        
-        /// <summary>
-        /// 受到伤害 
-        /// </summary>
-        public void TakeDamage();
-        
-        /// <summary>
-        /// 治疗 / 维修
-        /// </summary>
-        public void Heal();
+        int HpRecoveryValue { get; } 
     }
     
     public interface IUnit
@@ -32,5 +24,9 @@ namespace RTSGame
         IUnitData UnitData { get; } 
         void SetState(UnitState newState);  //TODO :考虑搞成状态机
         void TakeDamage(int damage);
+
+        void SetPosition(float3 position);
+        
+        void SetGuid(long guid);
     }
 }

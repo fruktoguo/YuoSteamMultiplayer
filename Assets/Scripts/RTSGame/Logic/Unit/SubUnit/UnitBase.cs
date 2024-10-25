@@ -1,3 +1,5 @@
+using Unity.Mathematics;
+
 namespace RTSGame
 {
     public abstract class UnitData : IUnitData
@@ -11,23 +13,30 @@ namespace RTSGame
         public int BuildTime { get; protected set; }
         public int HpRecoverySpeed { get; protected set; }
         public int HpRecoveryValue { get; protected set; }
-  
-        public void TakeDamage()
-        {
-            
-        }
 
-        public void Heal()
-        { 
+        protected UnitData(UnitType unitType, string name, int maxHp, int curHp, int atkNum, int cost, int buildTime, int hpRecoverySpeed, int hpRecoveryValue)
+        {
+            UnitType = unitType;
+            Name = name;
+            MaxHp = maxHp;
+            CurHp = curHp;
+            AtkNum = atkNum;
+            Cost = cost;
+            BuildTime = buildTime;
+            HpRecoverySpeed = hpRecoverySpeed;
+            HpRecoveryValue = hpRecoveryValue;
         } 
     }
     
     
     public abstract class UnitBase : IUnit
     {
-        public long Guid { get; } 
+        public long Guid { get; private set; } 
         public UnitState UnitState { get; }
         public IUnitData UnitData { get; }
+        
+        // --------
+        public float3 Position { get; protected set; }
         
         public UnitBase(IUnitData data)
         { 
@@ -44,6 +53,17 @@ namespace RTSGame
         public void TakeDamage(int damage)
         {
             
-        } 
+        }
+
+        public void SetPosition(float3 position)
+        {
+            Position = position;
+            L2VSetUnitPosition.SendEvent(Guid, position);
+        }
+        
+        public void SetGuid(long guid)
+        {
+            Guid = guid;
+        }
     }
 }

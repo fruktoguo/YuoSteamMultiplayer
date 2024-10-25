@@ -7,12 +7,8 @@ namespace RTSGame
     /// </summary>
     public class TestUnitFactory : IUnitFactory
     {  
-        public IUnitDataFactory DataFactory { get; }
-        public TestUnitFactory()
-        {
-            DataFactory = new HardcodedUnitDataFactory();
-        }
-        
+        public IUnitDataFactory DataFactory { get; } = new HardcodedUnitDataFactory();
+
         public IBuilding CreateBuilding(BuildingType buildingType)
         {
             BuildingData buildingData = DataFactory.CreateBuildingData(buildingType);

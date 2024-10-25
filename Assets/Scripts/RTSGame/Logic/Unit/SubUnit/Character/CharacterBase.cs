@@ -3,10 +3,15 @@ using UnityEngine;
 
 namespace RTSGame
 { 
-    public class CharacterData : UnitData, ICharacterData
-    {
+    public abstract class CharacterData : UnitData, ICharacterData
+    { 
         public CharacterType CharacterType { get; protected set; } 
         public float MovementSpeed { get; protected set; }
+        public CharacterData(UnitType unitType, CharacterType characterType, float movementSpeed, string name, int maxHp, int curHp, int atkNum, int cost, int buildTime, int hpRecoverySpeed, int hpRecoveryValue) : base(unitType, name, maxHp, curHp, atkNum, cost, buildTime, hpRecoverySpeed, hpRecoveryValue)
+        {
+            CharacterType = characterType;
+            MovementSpeed = movementSpeed;
+        } 
     }
     
     public abstract class CharacterBase : UnitBase , ICharacter
