@@ -4,9 +4,8 @@ using QFramework;
 
 namespace RTSGame
 {
-    public interface IManager : IBattleTick
-    {
-        void Init();
+    public interface IManager : IBattleInit,IBattleTick,IBattleDispose
+    { 
     }
     
     public abstract class ManagerBase<T> : SingletonClass<T> ,IManager, IUnRegisterList where T : ManagerBase<T>, new()
@@ -56,12 +55,11 @@ namespace RTSGame
             GameEventManager.UnRegisterEvent(onEvent); 
         }
         #endregion
-        
-
-        public virtual void UnInit()
+         
+        public new virtual void Dispose()
         {
             this.UnRegisterAll();
+            SingletonClass<T>.Dispose();
         }
-        
     }
 }

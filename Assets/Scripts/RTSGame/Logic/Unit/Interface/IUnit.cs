@@ -17,7 +17,7 @@ namespace RTSGame
         int HpRecoveryValue { get; } 
     }
     
-    public interface IUnit
+    public interface IUnit : IBattleInit, IBattleTick, IBattleDispose
     {
         long Guid { get; } 
         UnitState UnitState { get; }
@@ -27,6 +27,6 @@ namespace RTSGame
 
         void SetPosition(float3 position);
         
-        void SetGuid(long guid);
+        void SetGuid(long guid); 
     }
 }

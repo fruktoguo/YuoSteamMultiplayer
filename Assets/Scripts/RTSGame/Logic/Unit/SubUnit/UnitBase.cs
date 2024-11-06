@@ -65,5 +65,19 @@ namespace RTSGame
         {
             Guid = guid;
         }
+
+        public virtual void Init()
+        {
+        }
+
+        public virtual void Tick(float deltaTime)
+        {
+            
+        }
+
+        public virtual void Dispose()
+        {
+             
+        }
     }
 }
