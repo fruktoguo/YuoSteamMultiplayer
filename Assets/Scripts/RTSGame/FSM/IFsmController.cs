@@ -1,4 +1,4 @@
-﻿namespace JHGame.Tools.FSM
+﻿namespace RTSGame
 {
     public interface IFsmController<T>
     {
@@ -8,6 +8,6 @@
 
         void RemoveState(T stateType);
 
-        void UpdateState();
+        void UpdateState(float deltaTime); 
     }
 }

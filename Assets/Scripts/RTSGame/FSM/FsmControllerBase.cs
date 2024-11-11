@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace JHGame.Tools.FSM
+namespace RTSGame
 {
     public abstract class FsmControllerBase<T> : IFsmController<T> where T: Enum
     {
@@ -35,9 +35,9 @@ namespace JHGame.Tools.FSM
             }
         }
  
-        public void UpdateState()
+        public void UpdateState(float deltaTime)
         {
-            curState?.OnUpdate();
+            curState?.OnUpdate(deltaTime);
         }
     }
 }

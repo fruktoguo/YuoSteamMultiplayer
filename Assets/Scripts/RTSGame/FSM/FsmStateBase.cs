@@ -1,4 +1,4 @@
-﻿namespace JHGame.Tools.FSM
+﻿namespace RTSGame
 {
     public abstract class FsmStateBase<T> : IFsmState
     {
@@ -8,6 +8,6 @@
 
         public virtual void OnLeave(){}
 
-        public virtual void OnUpdate(){}
+        public virtual void OnUpdate(float deltaTime){}
     }
 }

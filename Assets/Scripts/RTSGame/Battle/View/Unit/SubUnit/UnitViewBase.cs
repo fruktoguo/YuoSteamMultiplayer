@@ -19,6 +19,9 @@ namespace RTSGame.Battle.View
             // _avatar.AddComponent(new NameComponent(this));
         }
 
+        /// <summary>
+        /// 注意，该方法不是mono的GetComponent
+        /// </summary> 
         public new T GetComponent<T>() where T : IComponentBase
         {
             return _avatar.GetComponent<T>();

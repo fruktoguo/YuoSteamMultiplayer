@@ -1,16 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace RTSGame
 {
-    public interface IAvatar
-    {
-        T GetComponent<T>() where T : IComponentBase;
-        void AddComponent<T>(T component) where T : IComponentBase;
-        void RemoveComponent<T>() where T : IComponentBase;
-    }
-    
-    public class AvatarBase : IAvatar
+    public class UnitAvatarBase : IAvatar
     {
         Dictionary<Type,IComponentBase> mComponents = new();
 
@@ -28,6 +21,8 @@ namespace RTSGame
             if (!mComponents.ContainsKey(typeof(T)))
             {
                 mComponents.Add(typeof(T), component);
+                
+                component.OnInit();
             } 
         }
 
@@ -35,24 +30,26 @@ namespace RTSGame
         {
             if (mComponents.ContainsKey(typeof(T)))
             {
+                mComponents[typeof(T)].OnDispose();
                 mComponents.Remove(typeof(T));
             } 
         }
-    }
 
-
-    public interface IComponentBase
-    {
-        IAvatar Origin { get; set; }
+        public void Update(float deltaTime)
+        {
+            foreach (var component in mComponents.Values)
+            {
+                component.OnUpdate(deltaTime);
+            } 
+        }
         
-        void OnInit();
+        public void Dispose()
+        {
+            foreach (var component in mComponents.Values)
+            {
+                component.OnDispose();
+            } 
+        }
         
-        void OnUpdate(float deltaTime);
-        
-        void OnDispose(); 
     }
-    
-    
-    
-    
 }

@@ -20,9 +20,8 @@ namespace RTSGame
     public interface IUnit : IBattleInit, IBattleTick, IBattleDispose
     {
         long Guid { get; } 
-        UnitState UnitState { get; }
+        IUnitBehaviorCtrl BehaviorCtrl { get; }
         IUnitData UnitData { get; } 
-        void SetState(UnitState newState);  //TODO :考虑搞成状态机
         void TakeDamage(int damage);
 
         void SetPosition(float3 position);
