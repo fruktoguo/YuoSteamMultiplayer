@@ -8,7 +8,7 @@ namespace RTSGame.Battle.View
     /// </summary>
     public interface IUnitViewFactory
     {
-        GameObject CreateUnitView(IUnitData unitData); 
-        GameObject CreateUnitView(IUnitData unitData, Vector3 position);
+        UnitViewBase CreateUnitView(IUnitData unitData); 
+        UnitViewBase CreateUnitView(IUnitData unitData, Vector3 position);
     }
 }

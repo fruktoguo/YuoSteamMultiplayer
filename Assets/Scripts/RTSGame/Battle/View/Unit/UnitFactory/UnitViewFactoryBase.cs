@@ -13,12 +13,12 @@ namespace RTSGame.Battle.View
         { 
         }
 
-        public GameObject CreateUnitView(IUnitData unitData)
+        public UnitViewBase CreateUnitView(IUnitData unitData)
         { 
             return null;
         }
 
-        public GameObject CreateUnitView(IUnitData unitData, Vector3 position)
+        public UnitViewBase CreateUnitView(IUnitData unitData, Vector3 position)
         {
             return null;
         }

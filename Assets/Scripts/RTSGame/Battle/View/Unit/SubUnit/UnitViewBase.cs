@@ -4,6 +4,7 @@ namespace RTSGame.Battle.View
 {
     public class UnitViewBase : MonoBehaviour, IUnitView , IAvatar
     {
+        public long GUID { get; set; }
         private AvatarBase _avatar;   // 用组合的方式进行组件处理
         protected virtual void Awake()
         {
@@ -35,6 +36,16 @@ namespace RTSGame.Battle.View
         public void RemoveComponent<T>() where T : IComponentBase
         { 
             _avatar.RemoveComponent<T>();
+        }
+
+        public virtual void Dispose()
+        {
+             
+        }
+
+        public virtual void Init()
+        { 
+            
         }
     }
 }

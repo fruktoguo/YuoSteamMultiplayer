@@ -1,6 +1,6 @@
 namespace RTSGame.Battle.View
 {
-    public interface IUnitView
+    public interface IUnitView : IBattleDispose, IBattleInit
     {
         
     }
