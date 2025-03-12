@@ -10,10 +10,7 @@ namespace RTSGame
 
         private long _globalGuid;
         // 持有所有的unit
-        private List<IUnit> _allUnit; 
-        
-
-
+        private List<IUnit> _allUnit;  
         
         #region 生命周期
         public override void Init()
@@ -55,9 +52,9 @@ namespace RTSGame
         /// <summary>
         /// 创建角色并初始化位置
         /// </summary> 
-        public void CreateCharacter(CharacterType characterType, float3 birthPos)
+        public void CreateUnit(int unitType, float3 birthPos)
         {
-            var character = _unitFactory.CreateCharacter(characterType);
+            var character = _unitFactory.CreateUnit(unitType);
             character.SetGuid(_globalGuid++);
 
             var createEvent = L2VCreateUnit.Allocate();

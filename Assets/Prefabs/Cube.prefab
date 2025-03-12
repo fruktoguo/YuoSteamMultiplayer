@@ -14,6 +14,9 @@ GameObject:
   - component: {fileID: 6917444926617392334}
   - component: {fileID: 7623573266693627524}
   - component: {fileID: 158130301659562951}
+  - component: {fileID: -8199186850579602991}
+  - component: {fileID: -6279515714564416988}
+  - component: {fileID: 6481499930754092396}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Enemy_Cube
@@ -199,3 +202,53 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &-8199186850579602991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6879893564932030746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81936539ae2d84665a86a2b3f531955f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: Cube
+  ScriptsFolder: Assets/Prefabs/
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Art/Prefab
+--- !u!114 &-6279515714564416988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6879893564932030746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d51f3a7c41ab0346b49ae50d456bece, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MarkType: 2
+  CustomComponentName: Cube
+  CustomComment: 
+  mComponentName: UnityEngine.BoxCollider
+--- !u!114 &6481499930754092396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6879893564932030746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eab58ebe11eb495897831c552fdbf87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Namespace: QFramework.Example
+  ScriptName: Cube
+  ScriptsFolder: Assets/Prefabs/
+  GeneratePrefab: 0
+  PrefabFolder: Assets/Art/Prefab

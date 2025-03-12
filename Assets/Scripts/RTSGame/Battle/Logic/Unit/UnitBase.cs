@@ -1,18 +1,24 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace RTSGame
 {
-    public abstract class UnitData : IUnitData
+    public class UnitData : IUnitData
     {
         public UnitType UnitType { get; protected set; } 
-        public string Name { get; protected set; } 
-        public int MaxHp { get; protected set; }
-        public int CurHp { get; protected set; }
-        public int AtkNum { get; protected set; }
-        public int Cost { get; protected set; }
-        public int BuildTime { get; protected set; }
-        public int HpRecoverySpeed { get; protected set; }
-        public int HpRecoveryValue { get; protected set; }
+        public string Name { get; set; } 
+        public int MaxHp { get; set; }
+        public int CurHp { get; set; }
+        public int AtkNum { get; set; }
+        public int Cost { get; set; }
+        public int BuildTime { get; set; }
+        public int HpRecoverySpeed { get; set; }
+        public int HpRecoveryValue { get; set; }
+        
+        public float3 Position { get; set; }
+
+        public float MovementSpeed { get; set; }
 
         protected UnitData(UnitType unitType, string name, int maxHp, int curHp, int atkNum, int cost, int buildTime, int hpRecoverySpeed, int hpRecoveryValue)
         {
@@ -25,7 +31,13 @@ namespace RTSGame
             BuildTime = buildTime;
             HpRecoverySpeed = hpRecoverySpeed;
             HpRecoveryValue = hpRecoveryValue;
-        } 
+        }
+
+        protected UnitData()
+        {
+            // TODO : 配置表更新
+        }
+        
     }
     
     
@@ -33,14 +45,11 @@ namespace RTSGame
     {
         public long Guid { get; private set; } 
         public IUnitBehaviorCtrl BehaviorCtrl { get; private set; }   // 行为控制器，从外部传进来。  想了想还是不放在组件里面了，毕竟是个常用的。 
-        public IUnitData UnitData { get; }
-        
-        // --------
-        public float3 Position { get; protected set; }
+        public IUnitData UnitData { get; } 
         
         protected readonly UnitAvatarBase Avatar;   // 用组合的方式进行组件处理
         
-        public UnitBase(IUnitData data)
+        public UnitBase(UnitData data)
         { 
             UnitData = data; 
             Avatar = new UnitAvatarBase();
@@ -61,31 +70,37 @@ namespace RTSGame
         protected virtual void OnSubInitComponent()
         {
             
+        }
+
+        public virtual void Move(Vector3 destination)
+        { 
+            SetPosition(destination);
         } 
 
-        public void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage)
         {
             
         }
 
-        public void SetPosition(float3 position)
+        public virtual void SetPosition(float3 position)
         {
-            Position = position;
+            UnitData.Position = position;
             L2VSetUnitPosition.SendEvent(Guid, position);
         }
         
-        public void SetGuid(long guid)
+        public virtual void SetGuid(long guid)
         {   
             Guid = guid;
         }
         
-        public void SetBehaviorCtrl(IUnitBehaviorCtrl behaviorCtrl)
+        public virtual void SetBehaviorCtrl(IUnitBehaviorCtrl behaviorCtrl)
         {
             BehaviorCtrl = behaviorCtrl;
         }
 
         public virtual void Init()
         {
+            InitComponent();
         }
 
         public virtual void Tick(float deltaTime)
@@ -114,6 +129,16 @@ namespace RTSGame
         public void RemoveComponent<T>() where T : IComponentBase
         { 
             Avatar.RemoveComponent<T>();
+        }
+
+        
+        public virtual void UseSkill(ISkill skillData)
+        {
+             
+        }
+
+        public virtual void Def(IAttackData attackData)
+        { 
         }
     }
 }

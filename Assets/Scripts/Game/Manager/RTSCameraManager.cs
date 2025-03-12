@@ -36,8 +36,8 @@ namespace Game.Manager
             var moveDelta = move.ReadValue<Vector2>();
             var scaleDelta = scale.ReadValue<float>();
 
-            targetPosition = originalPosition + moveDelta.x0y() * moveSpeed * Time.deltaTime;
-            targetPosition += moveOffset.x0y();
+            // targetPosition = originalPosition + moveDelta.x0y() * moveSpeed * Time.deltaTime;
+            // targetPosition += moveOffset.x0y();
             zoom += scaleDelta * zoomSpeed * Time.deltaTime;
             targetPosition += Vector3.up * zoom;
             

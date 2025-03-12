@@ -8,8 +8,7 @@ namespace RTSGame
     }
 
     public interface ICanUseSkill
-    {
-        List<ISkill> Skills { get; }
+    { 
         void UseSkill(ISkill skillData);
     }
     

@@ -1,32 +1,16 @@
 namespace RTSGame
 {
+    /// <summary>
+    /// 单位类型
+    /// </summary>
     public enum UnitType
     {
         None,               // 无
+        Hero,               // 英雄
         Character,          // 角色
         Building,           // 建筑
         Environment         // 环境
     }
-    
-    
-    public enum CharacterType
-    {
-        None,               // 无
-        Hero,               // 英雄
-        Worker,             // 工人
-        Soldier,            // 战士
-        Archer,             // 弓箭手
-        Mage                // 法师
-    }
-    
-    public enum BuildingType
-    {
-        None,           // 无建筑 
-        Farm,               // 农场  
-        Barracks,           // 兵营 
-        Tower,              // 防御塔 
-    } 
-    
     
     public enum UnitState
     {
@@ -50,34 +34,6 @@ namespace RTSGame
         Charge,             // 冲锋
         Stunned             // 眩晕
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
